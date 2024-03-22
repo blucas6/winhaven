@@ -8,6 +8,7 @@
 #include "ConsoleLogger.h"
 #include "config.h"
 #include "being.h"
+#include "town.h"
 
 // basic form of what can be displayed
 class LandTile {
@@ -64,8 +65,9 @@ class MapSlice {
         std::vector<std::vector<int>> blocking_array;   // for pathfinding
         std::vector<Land*> LandBinder;                  // binder of all possible land pieces
 
-        std::vector<Being*> CreatureList;
-        std::vector<Construct*> BuildingList;
+        std::vector<Being*> CreatureList;               // all creatures on landslice
+        std::vector<Construct*> BuildingList;           // all buildings on landslice
+        std::vector<Town> TownList;                     // array of all towns
 
         int humanAmount = 4;
 
