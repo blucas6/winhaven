@@ -225,7 +225,7 @@ bool distCheck(std::pair<int,int> bpos, std::pair<int,int> cpos) {
 // returns false when done building
 bool Build_C::placeBlock(Being *self) {
     if (BuildPoints.size() > 0) {
-        if (BuildPoints[0].first < SCREEN_R && BuildPoints[0].second < SCREEN_C && BuildPoints[0].first > -1 && BuildPoints[0].second > -1) {
+        if (BuildPoints[0].first < MAP_ROWS && BuildPoints[0].second < MAP_COLS && BuildPoints[0].first > -1 && BuildPoints[0].second > -1) {
             // check if being is next to point
             if (distCheck(self->pos, BuildPoints[0])) {
                 // define points for material
