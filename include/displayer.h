@@ -22,9 +22,7 @@ class Display {
         COORD endPoints = {SCREEN_C, SCREEN_R};
         SMALL_RECT consoleWriteArea;
         CHAR_INFO consoleBuffer[SCREEN_R * SCREEN_C];
-
-        // GLYPHS
-        // Glyph_Binder ;
+        std::pair<int,int> view = {0,0};
         
 };
 

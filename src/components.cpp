@@ -88,12 +88,17 @@ Build_C::Build_C(std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debu
 
 // Checks if build is overlapping with anything
 bool Build_C::isBuildValid() {
+    for (int i=0; i<BuildPoints.size(); i++) {
+        if (BuildPoints[i].first < 0 || BuildPoints[i].second < 0 || BuildPoints[i].first >= MAP_ROWS || BuildPoints[i].second >= MAP_COLS) {
+            return false;
+        }
+    }
     // go through all builds
-    for (Construct* el: *worldBuildListPtr) {
+    for (const Construct* el: *worldBuildListPtr) {
         // cycle through all pts in construct
-        for (auto pt: el->PointStructs) {
+        for (int b=0; b<el->BuildPoints.size(); b++) {
             for (int i=0; i<BuildPoints.size(); i++) {
-                if (pt.pos.first == BuildPoints[i].first && pt.pos.second == BuildPoints[i].second) {
+                if (el->BuildPoints[b].first == BuildPoints[i].first && el->BuildPoints[b].second == BuildPoints[i].second) {
                     return false;
                 }
             }
@@ -107,37 +112,57 @@ bool Build_C::init(Jobs job) {
     switch (job) {
         case FARMER:
             name = "Farm";
-            maxBuildsz = {7,7};
+            maxBuildsz = {10,10};
             break;
         case BREWER:
             name = "Alehouse";
-            maxBuildsz = {4,4};
+            maxBuildsz = {10,10};
             break;
         case PRIEST:
             name = "Church";
-            maxBuildsz = {8,8};
+            maxBuildsz = {10,10};
             break;
         default:
             name = "House";
-            maxBuildsz = {3,3};
+            maxBuildsz = {10,10};
             break;
     }
-    int maxtries = 100;
-    do {
-        BuildLocation.first = rand() % (SCREEN_R-maxBuildsz.first);
-        BuildLocation.second = rand() % (SCREEN_C-maxBuildsz.second);
-        BuildSize.first = 3 + rand() % maxBuildsz.first;
-        BuildSize.second = 3 + rand() % maxBuildsz.second;
-        findBuildPoints();
-        maxtries--;
-        if (maxtries <= 0) return false;
-    } while (!(isBuildValid()));
+
+    BuildLocation.first = rand() % (MAP_ROWS-maxBuildsz.first-1);
+    BuildLocation.second = rand() % (MAP_COLS-maxBuildsz.second-1);
+    BuildSize.first = 3 + rand() % maxBuildsz.first;
+    BuildSize.second = 3 + rand() % maxBuildsz.second;
+    findBuildPoints();
+    if (!isBuildValid()) {
+        bool valid = false;
+        for (int m=0; m<max_shimmy.first; m++) {
+            for (int r=-1; r<2; r++) {
+                for (int c=-1; c<2; c++) {
+                    BuildLocation.first += r+m;
+                    BuildLocation.second += c+m;
+                    findBuildPoints();
+                    if (isBuildValid()) {
+                        valid = true;
+                        break;
+                    }
+                }
+                if (valid) break;
+            }
+            if (valid) break;
+        }
+        if (!isBuildValid()) {
+            DEBUG_CONSOLE->cprintf("[build c]\tFailed to pick build\n");
+            return false;
+        }
+    }
     needtobuild = true;
     room.width = BuildSize.first;
     room.height = BuildSize.second;
     room.type = name;
+    room.BuildPoints = BuildPoints;
     Construct *roomptr = &room;
     worldBuildListPtr->push_back(roomptr);
+    DEBUG_CONSOLE->cprintf("[build c]\tBuild picked at (%d,%d)\n", BuildLocation.first, BuildLocation.second);
     return true;
 }
 
@@ -159,6 +184,8 @@ void Build_C::Update(Being *self) {
 
 // finds all the points for walls
 void Build_C::findBuildPoints() {
+    BuildPoints.clear();
+    DEBUG_CONSOLE->cprintf("[build c]\tTrying (%d,%d) w:%d h:%d\n", BuildLocation.first, BuildLocation.second, BuildSize.first, BuildSize.second);
     // top row
     for (int i=0; i<BuildSize.first; i++) {
         std::pair<int,int> top;

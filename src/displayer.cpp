@@ -18,24 +18,37 @@ void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vecto
         // Add land layer
         for (int i=0; i<SCREEN_R; i++) {
             for (int j=0; j<SCREEN_C; j++) {
-                buffer[i][j].Char.AsciiChar = land_pieces[i][j].current.glyph;
-                buffer[i][j].Attributes = land_pieces[i][j].current.color;
+                if (view.first+i<0 || view.first+i>=MAP_ROWS || view.second+j<0 || view.second+j>=MAP_COLS) {
+                    buffer[i][j].Char.AsciiChar = 0;
+                    buffer[i][j].Attributes = FG_BLACK | BG_BLACK;
+                } else {
+                    buffer[i][j].Char.AsciiChar = land_pieces[view.first+i][view.second+j].current.glyph;
+                    buffer[i][j].Attributes = land_pieces[view.first+i][view.second+j].current.color;
+                }
             }
         }
         // Add building layer
+        std::pair<int,int> realpos;
         for (const Construct* el: BuildingList) {
             // cycle through all pts in construct
             for (auto pt: el->PointStructs) {
-                buffer[pt.pos.first][pt.pos.second].Char.AsciiChar = pt.glyph;
-                buffer[pt.pos.first][pt.pos.second].Attributes = pt.color;
+                realpos.first = pt.pos.first - view.first;
+                realpos.second = pt.pos.second - view.second;
+                if (realpos.first>=0 && realpos.first<MAP_ROWS && realpos.second>=0 && realpos.second<MAP_COLS) {
+                    buffer[realpos.first][realpos.second].Char.AsciiChar = pt.glyph;
+                    buffer[realpos.first][realpos.second].Attributes = pt.color;
+                }
             }
         }
         // Add creature layer
         for (const Being* el : CreatureList) {
-            buffer[el->pos.first][el->pos.second].Char.AsciiChar = el->glyph;
-            buffer[el->pos.first][el->pos.second].Attributes = el->color;
+            realpos.first = el->pos.first - view.first;
+            realpos.second = el->pos.second - view.second;
+            if (realpos.first>=0 && realpos.first<MAP_ROWS && realpos.second>=0 && realpos.second<MAP_COLS) {
+                buffer[realpos.first][realpos.second].Char.AsciiChar = el->glyph;
+                buffer[realpos.first][realpos.second].Attributes = el->color;
+            }
         }
-
 
         // Output screen
         for (int i=0; i<SCREEN_R; i++) {

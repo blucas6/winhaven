@@ -22,10 +22,16 @@ int main() {
     char cmd;
     // MAIN LOOP
     while(true) {
-        game.UpdateWorld();
-        game.PrintScreen();
         cmd = _getch();
-        if (cmd == 'q') break;
+        if (cmd == 'q') break; 
+        else if (cmd == 'a') game.gDisplay.view.second--;
+        else if (cmd == 'w') game.gDisplay.view.first--;
+        else if (cmd == 's') game.gDisplay.view.first++;
+        else if (cmd == 'd') game.gDisplay.view.second++;
+        else {
+            game.UpdateWorld();
+        }
+        game.PrintScreen();
     }
 
     return 0;

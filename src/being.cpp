@@ -37,7 +37,7 @@ void Being::Update(std::vector<std::vector<int>> *blocking_array) {
             NewThought();
         } else laziness.second--;
     }
-    DEBUG_CONSOLE->cprintf("[being]\tUpdating being ID(%d) [T:%d | S:%d]\n", ID, thought, state);
+    DEBUG_CONSOLE->cprintf("[being]\tUpdating being ID(%d) [T:%d | S:%d | P:%d,%d]\n", ID, thought, state, pos.first, pos.second);
     // Update all the components for this being
     for (Component *comp : ComponentList) {
         comp->Update(this);

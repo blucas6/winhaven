@@ -59,6 +59,8 @@ class Build_C : public Component {
         Room room;
         PointStruct material;
 
+        std::pair<int,int> max_shimmy = {10, 0};
+
         void Update(Being *self);
         bool init(Jobs Job);
         void findBuildPoints();

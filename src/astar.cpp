@@ -215,6 +215,6 @@ bool Astar::astar(std::vector<std::vector<int>> grid, std::pair<int,int> src, st
     // reach the destination cell. This may happen when the
     // there is no way to destination cell (due to
     // blockages)
-    _debugconsole->cprintf("[astar]\tOMEGA failure!");
+    _debugconsole->cprintf("[astar]\tNO PATH");
     return false;
 }
