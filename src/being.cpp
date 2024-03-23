@@ -39,7 +39,7 @@ void Being::Update() {
             NewThought();
         } else laziness.second--;
     }
-    DEBUG_CONSOLE->cprintf("[being]\tUpdating being ID(%d) [T:%d | S:%d | P:%d,%d]\n", ID, thought, state, pos.first, pos.second);
+    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[being]\tUpdating being ID(%d) [T:%d | S:%d | P:%d,%d]\n", ID, thought, state, pos.first, pos.second);
     // Update all the components for this being
     for (Component *comp : ComponentList) {
         comp->Update(this);

@@ -13,20 +13,31 @@ BIN_DIR := bin
 SRC := $(wildcard $(SRC_DIR)/*.cpp)
 HEADERS := $(wildcard $(INC_DIR)/*.h)
 OBJ := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
+main=$(OBJ_DIR)/main.o
+speed=$(OBJ_DIR)/speedtest.o
+NOMAIN_OBJ := $(filter-out $(main),$(OBJ))
+MAIN_OBJ := $(filter-out $(speed),$(OBJ))
 
 # Executable name
 TARGET := $(BIN_DIR)/main
+SPEED_TARGET := $(BIN_DIR)/speed
 
 # Default target
 all: $(TARGET)
 
 # Rule to build the executable
-$(TARGET): $(OBJ)
+$(TARGET): $(MAIN_OBJ)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 # Rule to compile source files into object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c $< -o $@
+
+speed: $(SPEED_TARGET)
+
+$(SPEED_TARGET): $(NOMAIN_OBJ)
+	echo $(NOMAIN_OBJ)
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
 debug:
 	$(CXX) ConsoleLoggerHelper.cpp -o $(BIN_DIR)/ConsoleLoggerHelper.exe

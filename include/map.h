@@ -56,8 +56,9 @@ class Moss : public LandTile {
 
 class MapSlice {
     public:
+        MapSlice();
         MapSlice(CConsoleLoggerEx *_debugconsole);
-        CConsoleLoggerEx *DEBUG_CONSOLE;
+        CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
 
         std::vector<std::vector<int>> land_array;       // array for storage of numerical land values
         std::vector<std::vector<Land>> land_pieces;     // actual char glyphs for displaying

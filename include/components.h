@@ -17,7 +17,7 @@ class Component {
     public:
         Component(ComponentID _ID, CConsoleLoggerEx *_debugconsole);
         ComponentID ID;
-        CConsoleLoggerEx *DEBUG_CONSOLE;
+        CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
 
         virtual void Update(Being *self);
 };

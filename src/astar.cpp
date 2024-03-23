@@ -40,29 +40,29 @@ void Astar::tracePath(Cell cellDetails[], std::pair<int,int> dest, int C, std::v
     Path.emplace_back(row, col);
 }
 
-bool Astar::astar(std::vector<std::vector<int>> grid, std::pair<int,int> src, std::pair<int,int> dest, std::vector<std::pair<int,int>> &Path, CConsoleLoggerEx *_debugconsole) {
-    _debugconsole->cprintf("[astar]\tStarting Astar...");
+bool Astar::astar(std::vector<std::vector<int>> grid, std::pair<int,int> src, std::pair<int,int> dest, std::vector<std::pair<int,int>> &Path) {
+    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[astar]\tStarting Astar...");
     // If the source is out of range
     if (!isValid(src)) {
-        _debugconsole->cprintf("[astar]\tSource OOR!");
+        if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[astar]\tSource OOR!");
         return false;
     }
  
     // If the destination is out of range
     if (!isValid(dest)) {
-        _debugconsole->cprintf("[astar]\tDest OOR!");
+        if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[astar]\tDest OOR!");
         return false;
     }
  
     // Destination is blocked
     if (!isUnBlocked(grid, dest)) {
-        _debugconsole->cprintf("[astar]\tDest blocked!");
+        if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[astar]\tDest blocked!");
         return false;
     }
  
     // If the destination cell is the same as source cell
     if (isDestination(src, dest)) {
-        _debugconsole->cprintf("[astar]\tAlready at dest!");
+        if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[astar]\tAlready at dest!");
         return false;
     }
  
@@ -215,6 +215,6 @@ bool Astar::astar(std::vector<std::vector<int>> grid, std::pair<int,int> src, st
     // reach the destination cell. This may happen when the
     // there is no way to destination cell (due to
     // blockages)
-    _debugconsole->cprintf("[astar]\tNO PATH");
+    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[astar]\tNO PATH");
     return false;
 }

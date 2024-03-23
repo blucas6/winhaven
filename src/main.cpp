@@ -11,12 +11,11 @@ int main() {
     // SETUP
     CConsoleLoggerEx DEBUG_CONSOLE;
 	DEBUG_CONSOLE.Create("Debugger");
-	
+    srand((unsigned) time(NULL));
 	DEBUG_CONSOLE.cls(CConsoleLoggerEx::COLOR_BACKGROUND_BLACK);
 	DEBUG_CONSOLE.gotoxy(0,0);
 	DEBUG_CONSOLE.cprintf( CConsoleLoggerEx::COLOR_WHITE| CConsoleLoggerEx::COLOR_BACKGROUND_BLACK,"[main]\tDebugger is ON\n");
 
-    srand((unsigned) time(NULL));
     Game game(&DEBUG_CONSOLE);
     game.PrintScreen();
     char cmd;
