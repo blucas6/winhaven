@@ -3,7 +3,7 @@
 
 short _ID = 1;
 
-Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array) {
+Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array) {
     ID = _ID++;
     type = t;
     glyph = gly;
@@ -16,6 +16,8 @@ Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLo
     DEBUG_CONSOLE = _debugconsole;
     laziness.first = 1 + rand() % 5;
     laziness.second = laziness.first;
+    currBlockingArray = blocking_array;
+    currConstructArray = construct_array;
 }
 
 void Being::NewThought() {
@@ -23,8 +25,8 @@ void Being::NewThought() {
     thought = thought_list[c];
 }
 
-void Being::Update(std::vector<std::vector<int>> *blocking_array) {
-    currBlockingArray = blocking_array;
+void Being::Update() {
+    // currBlockingArray = blocking_array;
     // Update new thought for this being
     if (thought == NO_THOT)  {
         NewThought();
@@ -44,8 +46,8 @@ void Being::Update(std::vector<std::vector<int>> *blocking_array) {
     }
 }
 
-Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array) 
-: Being("Human", '@', FG_WHITE, _pos, _debugconsole, blocking_array) {
+Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array) 
+: Being("Human", '@', FG_WHITE, _pos, _debugconsole, blocking_array, construct_array) {
     // give a human a job component
     ComponentList.push_back(new Job_C(_job, _debugconsole));
     ComponentList.push_back(new Build_C(buildingListp, _debugconsole));
