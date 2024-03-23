@@ -10,7 +10,7 @@ class Component;
 
 class Being {
     public:
-        Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array);
+        Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array);
         short ID;
         std::string type;
         char glyph;
@@ -26,16 +26,17 @@ class Being {
         std::vector<Component*> ComponentList;
         CConsoleLoggerEx *DEBUG_CONSOLE;
         std::vector<std::vector<int>> *currBlockingArray;   // pointer to the current turns blocking_array for astar
+        std::vector<std::vector<int>> *currConstructArray;   // pointer to the mapslices construction array - used to update build pts
 
         std::pair<int,int> laziness;        // how long they relax [MAX, COUNTER]
 
         virtual void NewThought();
-        virtual void Update(std::vector<std::vector<int>> *blocking_array);
+        virtual void Update();
 };
 
 class Human : public Being {
     public:
-        Human(std::pair<int,int> p, Jobs j, std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array);
+        Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array);
 };
 
 #endif

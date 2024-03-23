@@ -4,7 +4,7 @@
 #define SCREEN_R 30
 #define SCREEN_C 120
 #define TITLE "WinHaven"
-#define MAP_ROWS 35
-#define MAP_COLS 125
+#define MAP_ROWS 30
+#define MAP_COLS 120
 
 #endif
