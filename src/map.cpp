@@ -1,7 +1,7 @@
 #include "map.h"
 #include "graphics.h"
 
-int ID = 1;
+int LAND_ID = 1;
 
 // LANDTILES ///////////////////////////////////////////////////////
 LandTile::LandTile() {
@@ -60,19 +60,19 @@ void Land::ungrowth() {
 }
 
 // TYPES ///////////////////////////////////
-Dirt::Dirt() : LandTile("Dirt", ID++, {FG_DARKYELLOW}, {'.'}) {
+Dirt::Dirt() : LandTile("Dirt", LAND_ID++, {FG_DARKYELLOW}, {'.'}) {
 
 }
 
-Rock::Rock() : LandTile("Rock", ID++, {FG_DARKGREY, FG_LIGHTGREY}, {':', '.'}) {
+Rock::Rock() : LandTile("Rock", LAND_ID++, {FG_DARKGREY, FG_LIGHTGREY}, {':', '.'}) {
 
 }
 
-Grass::Grass() : LandTile("Grass", ID++, {FG_GREEN}, {'\'', '"', '`', ',', ';'}) {
+Grass::Grass() : LandTile("Grass", LAND_ID++, {FG_GREEN}, {'\'', '"', '`', ',', ';'}) {
 
 }
 
-Moss::Moss() : LandTile("Moss", ID++, {FG_DARKGREEN}, {'*'}) {
+Moss::Moss() : LandTile("Moss", LAND_ID++, {FG_DARKGREEN}, {'*'}) {
 
 }
 ////////////////////////////////////////////
@@ -113,6 +113,10 @@ land_pieces(MAP_ROWS, std::vector<Land>(MAP_COLS)), blocking_array(MAP_ROWS, std
     DEBUG_CONSOLE = _debugconsole;
 }
 
+void MapSlice::generateTowns() {
+    TownList.push_back(Town());
+}
+
 void MapSlice::mapGen() {
     LandBinder.push_back(new Land(Dirt(), Grass()));       // add all land pieces
     LandBinder.push_back(new Land(Rock(), Moss()));
@@ -120,18 +124,24 @@ void MapSlice::mapGen() {
     getMapGlyphs();
     cleanBlockingArray();
     cleanConstructArray();
+    generateTowns();
     generateCreatures();
     DEBUG_CONSOLE->cprintf("[map]\tmap gen DONE\n");
 }
 
 void MapSlice::generateCreatures() {
-    std::pair<int,int> pos;
-    Jobs job;
-    std::vector<Jobs> jobtypes = {NOJOB, BREWER, FARMER, PRIEST};
-    for(int i=0; i<humanAmount; i++) {
-        pos = {rand() % MAP_ROWS, rand() % MAP_COLS};
-        job = jobtypes[rand() % jobtypes.size()];
-        CreatureList.push_back(new Human(pos, job, &BuildingList, DEBUG_CONSOLE, &blocking_array, &construct_array));
+    if (TownList.size() > 0) {
+        DEBUG_CONSOLE->cprintf("[map]\tStarting creature generation\n");
+        std::pair<int,int> pos;
+        Jobs job;
+        std::vector<Jobs> jobtypes = {NOJOB, BREWER, FARMER, PRIEST};
+        for(int i=0; i<humanAmount; i++) {
+            pos = {rand() % MAP_ROWS, rand() % MAP_COLS};
+            job = jobtypes[rand() % jobtypes.size()];
+            Human *human = new Human(pos, job, &BuildingList, DEBUG_CONSOLE, &blocking_array, &construct_array);
+            human->myTown = &TownList[0];
+            TownList[0].CreatureList.push_back(human);
+        }
     }
 }
 
@@ -163,6 +173,11 @@ void MapSlice::updateBlockingArray() {
     for (int i=0; i<CreatureList.size(); i++) {
         blocking_array[CreatureList[i]->pos.first][CreatureList[i]->pos.second] = 1;
     }
+    for (int t=0; t<TownList.size(); t++) {
+        for (int i=0; i<TownList[t].CreatureList.size(); i++) {
+            blocking_array[TownList[t].CreatureList[i]->pos.first][TownList[t].CreatureList[i]->pos.second] = 1;
+        }
+    }
 }
 
 void MapSlice::Update() {
@@ -171,6 +186,12 @@ void MapSlice::Update() {
         cleanBlockingArray();
         updateBlockingArray();
         CreatureList[i]->Update();
+    }
+    // update creatures in towns
+    for (int t=0; t<TownList.size(); t++) {
+        for (int i=0; i<TownList[t].CreatureList.size(); i++) {
+            TownList[t].CreatureList[i]->Update();
+        }
     }
 }
 //////////////////////////////////////////////////////

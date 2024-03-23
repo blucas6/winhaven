@@ -1,10 +1,10 @@
 #include "being.h"
 #include "components.h"
 
-short _ID = 1;
+short BEING_ID = 1;
 
 Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array) {
-    ID = _ID++;
+    ID = BEING_ID++;
     type = t;
     glyph = gly;
     color = c;
@@ -17,7 +17,7 @@ Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLo
     laziness.first = 1 + rand() % 5;
     laziness.second = laziness.first;
     currBlockingArray = blocking_array;
-    currConstructArray = construct_array;
+    currConstructArray = construct_array; 
 }
 
 void Being::NewThought() {

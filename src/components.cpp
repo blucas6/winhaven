@@ -31,9 +31,11 @@ void Movement_C::Wander(Being *self) {
     std::pair<int,int> p;
     p.first = self->pos.first + choices[c][0];
     p.second = self->pos.second + choices[c][1];
-    if (astar.isValid(p) && astar.isUnBlocked((*self->currBlockingArray), p)) {
-        self->pos.first += choices[c][0];
-        self->pos.second += choices[c][1];
+    if (self->currBlockingArray != nullptr) {
+        if (astar.isValid(p) && astar.isUnBlocked((*self->currBlockingArray), p)) {
+            self->pos.first += choices[c][0];
+            self->pos.second += choices[c][1];
+        }
     }
 }
 
@@ -46,7 +48,7 @@ void Movement_C::Move(Being *self) {
         //         DEBUG_CONSOLE->cprintf("%d", (*self).currBlockingArray[i][j]);
         //     }
         // }
-        if (astar.astar(*(self->currBlockingArray), self->pos, self->moveto, Path, DEBUG_CONSOLE)) {
+        if (self->currBlockingArray != nullptr && astar.astar(*(self->currBlockingArray), self->pos, self->moveto, Path, DEBUG_CONSOLE)) {
             // path success
             DEBUG_CONSOLE->cprintf("[move c]\tMoving being (%d,%d)\n", Path[0].first, Path[0].second);
             self->pos.first = Path[Path.size()-2].first;
@@ -161,7 +163,8 @@ bool Build_C::init(Jobs job) {
     room.type = name;
     room.BuildPoints = BuildPoints;
     Construct *roomptr = &room;
-    worldBuildListPtr->push_back(roomptr);
+    if (worldBuildListPtr != nullptr) worldBuildListPtr->push_back(roomptr);
+    else DEBUG_CONSOLE->cprintf("build c]\t**Error no world ptr**\n");
     DEBUG_CONSOLE->cprintf("[build c]\tBuild picked at (%d,%d)\n", BuildLocation.first, BuildLocation.second);
     return true;
 }
@@ -227,7 +230,7 @@ bool Build_C::placeBlock(Being *self) {
     if (BuildPoints.size() > 0) {
         if (BuildPoints[0].first < MAP_ROWS && BuildPoints[0].second < MAP_COLS && BuildPoints[0].first > -1 && BuildPoints[0].second > -1) {
             // check if being is next to point
-            if (distCheck(self->pos, BuildPoints[0])) {
+            if (distCheck(self->pos, BuildPoints[0]) && self->currConstructArray != nullptr) {
                 // define points for material
                 material.pos.first = BuildPoints[0].first;
                 material.pos.second = BuildPoints[0].second;

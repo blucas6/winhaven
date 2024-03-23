@@ -49,7 +49,7 @@ class Job_C : public Component {
 class Build_C : public Component {
     public:
         Build_C(std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debugconsole);
-        std::vector<Construct*> *worldBuildListPtr;         // pointer to construction list
+        std::vector<Construct*> *worldBuildListPtr = nullptr;         // pointer to construction list
         std::string name;
         std::pair<int,int> BuildLocation;
         std::pair<int,int> BuildSize;

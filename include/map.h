@@ -79,6 +79,7 @@ class MapSlice {
         void cleanConstructArray();
         void updateBlockingArray();
         void generateCreatures();
+        void generateTowns();
         void Update();
 };
 

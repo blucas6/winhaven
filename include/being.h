@@ -6,16 +6,17 @@
 #include "ConsoleLogger.h"
 #include "graphics.h"
 
+class Town;
+
 class Component;
 
 class Being {
     public:
         Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array);
-        short ID;
+        int ID;
         std::string type;
         char glyph;
         int color;
-        std::pair<int,int> worldsz;                         // used for astar boundaries
         std::pair<int,int> pos;
         std::pair<int,int> moveto;
         int blockingLevel = 1;                              // cannot pass through this blocking level
@@ -25,8 +26,10 @@ class Being {
         bool newthought = false;                            // dictates whether or not to pick a new thought
         std::vector<Component*> ComponentList;
         CConsoleLoggerEx *DEBUG_CONSOLE;
-        std::vector<std::vector<int>> *currBlockingArray;   // pointer to the current turns blocking_array for astar
-        std::vector<std::vector<int>> *currConstructArray;   // pointer to the mapslices construction array - used to update build pts
+        std::vector<std::vector<int>> *currBlockingArray = nullptr;   // pointer to the current turns blocking_array for astar
+        std::vector<std::vector<int>> *currConstructArray = nullptr;   // pointer to the mapslices construction array - used to update build pts
+
+        Town *myTown = nullptr;
 
         std::pair<int,int> laziness;        // how long they relax [MAX, COUNTER]
 
