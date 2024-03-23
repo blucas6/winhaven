@@ -195,8 +195,8 @@ void Build_C::Update(Being *self) {
 }
 
 // finds all the points for walls
-void Build_C::findBuildPoints() {
-    BuildPoints.clear();
+void Build_C::findWallPoints() {
+    WallPoints.clear();
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tTrying (%d,%d) w:%d h:%d\n", BuildLocation.first, BuildLocation.second, BuildSize.first, BuildSize.second);
     // top row
     for (int i=0; i<BuildSize.first; i++) {
@@ -253,9 +253,9 @@ bool Build_C::placeBlock(Being *self) {
                 // add material point to room
                 PointStruct wall = material;
                 room.PointStructs.push_back(wall);
-                (*self->currConstructArray)[BuildPoints[0].first][BuildPoints[0].second] = 1;
-                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tconstruct array @ (%d,%d) = %d\n", BuildPoints[0].first, BuildPoints[0].second, (*(self->currConstructArray))[BuildPoints[0].first][BuildPoints[0].second]);
-                BuildPoints.erase(BuildPoints.begin());
+                (*self->currConstructArray)[WallPoints[0].first][WallPoints[0].second] = 1;
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tconstruct array @ (%d,%d) = %d\n", WallPoints[0].first, WallPoints[0].second, (*(self->currConstructArray))[WallPoints[0].first][WallPoints[0].second]);
+                WallPoints.erase(WallPoints.begin());
                 return true;
             } else {
                 // being is not at point - moveto it
