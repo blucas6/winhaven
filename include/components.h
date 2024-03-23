@@ -54,7 +54,8 @@ class Build_C : public Component {
         std::pair<int,int> BuildLocation;
         std::pair<int,int> BuildSize;
         std::pair<int,int> maxBuildsz;
-        std::vector<std::pair<int,int>> BuildPoints;
+        std::vector<std::pair<int,int>> WallPoints;
+        std::vector<std::pair<int,int>> FloorPoints;
         bool needtobuild = false;           // true when build is ready to start building
         Room room;
         PointStruct material;
@@ -63,7 +64,8 @@ class Build_C : public Component {
 
         void Update(Being *self);
         bool init(Jobs Job);
-        void findBuildPoints();
+        void findWallPoints();
+        void findFloorPoints();
         bool placeBlock(Being *self);
         bool isBuildValid();
 };

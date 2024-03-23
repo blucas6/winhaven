@@ -16,7 +16,8 @@ class Construct {
         Construct(std::string _type);
         std::string type;
         std::vector<PointStruct> PointStructs;
-        std::vector<std::pair<int,int>> BuildPoints;    // pts that show where the structure is planned to be - needed for checking validity
+        std::vector<std::pair<int,int>> wallPoints;    // pts that show where the structure is planned to be - needed for checking validity
+        std::vector<std::pair<int,int>> floorPoints;   // inside area of build 
 
         void Update();
 };

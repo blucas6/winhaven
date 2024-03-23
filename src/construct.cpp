@@ -16,6 +16,7 @@ Room::Room(std::string _name) : Construct(_name) {
     roof.color = FG_DARKYELLOW;
     floor.glyph = '.';
     floor.color = FG_DARKYELLOW;
+    floor.blockingLevel = 0;
     door.glyph = '+';
     door.color = FG_DARKYELLOW;
     door.blockingLevel = 0;
@@ -40,6 +41,12 @@ void Room::Finish(CConsoleLoggerEx *debugconsole) {
     PointStructs[door_ind[ch]].glyph = door.glyph;
     PointStructs[door_ind[ch]].color = door.color;
     PointStructs[door_ind[ch]].blockingLevel = door.blockingLevel;
+
+    // for (int i=0; i<floorPoints.size(); i++) {
+    //     floor.pos.first = floorPoints[i].first;
+    //     floor.pos.second = floorPoints[i].second;
+    //     PointStructs.push_back(floor);
+    // }
 }
 
 

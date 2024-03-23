@@ -90,17 +90,26 @@ Build_C::Build_C(std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debu
 
 // Checks if build is overlapping with anything
 bool Build_C::isBuildValid() {
-    for (int i=0; i<BuildPoints.size(); i++) {
-        if (BuildPoints[i].first < 0 || BuildPoints[i].second < 0 || BuildPoints[i].first >= MAP_ROWS || BuildPoints[i].second >= MAP_COLS) {
+    // used when builds are shimmied
+    for (int i=0; i<WallPoints.size(); i++) {
+        if (WallPoints[i].first < 0 || WallPoints[i].second < 0 || WallPoints[i].first >= MAP_ROWS || WallPoints[i].second >= MAP_COLS) {
             return false;
         }
     }
     // go through all builds
     for (const Construct* el: *worldBuildListPtr) {
-        // cycle through all pts in construct
-        for (int b=0; b<el->BuildPoints.size(); b++) {
-            for (int i=0; i<BuildPoints.size(); i++) {
-                if (el->BuildPoints[b].first == BuildPoints[i].first && el->BuildPoints[b].second == BuildPoints[i].second) {
+        // cycle through all wall pts in construct
+        for (int b=0; b<el->wallPoints.size(); b++) {
+            for (int i=0; i<WallPoints.size(); i++) {
+                if (el->wallPoints[b].first == WallPoints[i].first && el->wallPoints[b].second == WallPoints[i].second) {
+                    return false;
+                }
+            }
+        }
+        // go through floor points (builds could be inside eachother!)
+        for (int b=0; b<el->floorPoints.size(); b++) {
+            for (int i=0; i<FloorPoints.size(); i++) {
+                if (el->floorPoints[b].first == FloorPoints[i].first && el->floorPoints[b].second == FloorPoints[i].second) {
                     return false;
                 }
             }
@@ -134,7 +143,7 @@ bool Build_C::init(Jobs job) {
     BuildLocation.second = rand() % (MAP_COLS-maxBuildsz.second-1);
     BuildSize.first = 3 + rand() % maxBuildsz.first;
     BuildSize.second = 3 + rand() % maxBuildsz.second;
-    findBuildPoints();
+    findWallPoints();
     if (!isBuildValid()) {
         bool valid = false;
         for (int m=0; m<max_shimmy.first; m++) {
@@ -142,7 +151,7 @@ bool Build_C::init(Jobs job) {
                 for (int c=-1; c<2; c++) {
                     BuildLocation.first += r+m;
                     BuildLocation.second += c+m;
-                    findBuildPoints();
+                    findWallPoints();
                     if (isBuildValid()) {
                         valid = true;
                         break;
@@ -161,7 +170,8 @@ bool Build_C::init(Jobs job) {
     room.width = BuildSize.first;
     room.height = BuildSize.second;
     room.type = name;
-    room.BuildPoints = BuildPoints;
+    room.wallPoints = WallPoints;
+    room.floorPoints = FloorPoints;
     Construct *roomptr = &room;
     if (worldBuildListPtr != nullptr) worldBuildListPtr->push_back(roomptr);
     else DEBUG_CONSOLE->cprintf("build c]\t**Error no world ptr**\n");
@@ -186,36 +196,43 @@ void Build_C::Update(Being *self) {
 }
 
 // finds all the points for walls
-void Build_C::findBuildPoints() {
-    BuildPoints.clear();
+void Build_C::findWallPoints() {
+    WallPoints.clear();
     DEBUG_CONSOLE->cprintf("[build c]\tTrying (%d,%d) w:%d h:%d\n", BuildLocation.first, BuildLocation.second, BuildSize.first, BuildSize.second);
     // top row
     for (int i=0; i<BuildSize.first; i++) {
         std::pair<int,int> top;
         top.first = BuildLocation.first + 0;
         top.second = BuildLocation.second + i;
-        BuildPoints.push_back(top);
+        WallPoints.push_back(top);
     }
     // bottom row
     for (int i=0; i<BuildSize.first; i++) {
         std::pair<int,int> bot;
         bot.first = BuildLocation.first + BuildSize.second - 1 + 0;
         bot.second = BuildLocation.second + i;
-        BuildPoints.push_back(bot);
+        WallPoints.push_back(bot);
     }
     // left col
     for (int i=1; i<BuildSize.second-1; i++) {
         std::pair<int,int> left;
         left.first = BuildLocation.first + i;
         left.second = BuildLocation.second + 0;
-        BuildPoints.push_back(left);
+        WallPoints.push_back(left);
     }            
     // right col
     for (int i=1; i<BuildSize.second-1; i++) {
         std::pair<int,int> right;
         right.first = BuildLocation.first + i;
         right.second = BuildLocation.second + BuildSize.first - 1 + 0;
-        BuildPoints.push_back(right);
+        WallPoints.push_back(right);
+    }
+
+    // find floor points
+    for (int i=BuildLocation.first+1; i<BuildSize.first-1; i++) {
+        for (int j=BuildLocation.second+1; j<BuildSize.second-1; j++) {
+            FloorPoints.push_back(std::make_pair(i,j));
+        }
     }
 }
 
@@ -227,24 +244,23 @@ bool distCheck(std::pair<int,int> bpos, std::pair<int,int> cpos) {
 // adds a wall to the map (construction list)
 // returns false when done building
 bool Build_C::placeBlock(Being *self) {
-    if (BuildPoints.size() > 0) {
-        if (BuildPoints[0].first < MAP_ROWS && BuildPoints[0].second < MAP_COLS && BuildPoints[0].first > -1 && BuildPoints[0].second > -1) {
+    if (WallPoints.size() > 0) {
+        if (WallPoints[0].first < MAP_ROWS && WallPoints[0].second < MAP_COLS && WallPoints[0].first > -1 && WallPoints[0].second > -1) {
             // check if being is next to point
-            if (distCheck(self->pos, BuildPoints[0]) && self->currConstructArray != nullptr) {
+            if (distCheck(self->pos, WallPoints[0]) && self->currConstructArray != nullptr) {
                 // define points for material
-                material.pos.first = BuildPoints[0].first;
-                material.pos.second = BuildPoints[0].second;
+                material.pos.first = WallPoints[0].first;
+                material.pos.second = WallPoints[0].second;
                 // add material point to room
                 PointStruct wall = material;
                 room.PointStructs.push_back(wall);
-                (*self->currConstructArray)[BuildPoints[0].first][BuildPoints[0].second] = 1;
-                DEBUG_CONSOLE->cprintf("[build c]\tconstruct array @ (%d,%d) = %d\n", BuildPoints[0].first, BuildPoints[0].second, (*(self->currConstructArray))[BuildPoints[0].first][BuildPoints[0].second]);
-                BuildPoints.erase(BuildPoints.begin());
+                (*self->currConstructArray)[WallPoints[0].first][WallPoints[0].second] = 1;
+                WallPoints.erase(WallPoints.begin());
                 return true;
             } else {
                 // being is not at point - moveto it
-                self->moveto.first = BuildPoints[0].first;
-                self->moveto.second = BuildPoints[0].second;
+                self->moveto.first = WallPoints[0].first;
+                self->moveto.second = WallPoints[0].second;
                 return true;
             }
         } else {
