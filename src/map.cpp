@@ -105,10 +105,6 @@ land_pieces(MAP_ROWS, std::vector<Land>(MAP_COLS)), blocking_array(MAP_ROWS, std
 }
 
 void MapSlice::mapGen() {
-    Dirt dirttile;
-    Grass grasstile;
-    Rock rocktile;
-    Moss mosstile;
     LandBinder.push_back(new Land(Dirt(), Grass()));       // add all land pieces
     LandBinder.push_back(new Land(Rock(), Moss()));
     generateLand();
