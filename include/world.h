@@ -9,8 +9,9 @@
 
 class World {
     public:
+        World();
         World(CConsoleLoggerEx *_debugconsole);
-        CConsoleLoggerEx *DEBUG_CONSOLE;
+        CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
         MapSlice gMap;
         
         void WorldGen();

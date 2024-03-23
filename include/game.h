@@ -8,8 +8,9 @@
 
 class Game {
     public:
+        Game();
         Game(CConsoleLoggerEx *_debugconsole);
-        CConsoleLoggerEx *DEBUG_CONSOLE;
+        CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
         World world;
         Display gDisplay;
         void PrintScreen();

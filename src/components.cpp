@@ -7,12 +7,12 @@ Component::Component(ComponentID _ID, CConsoleLoggerEx *_debugconsole) {
 }
 
 void Component::Update(Being *self) {
-    DEBUG_CONSOLE->cprintf("[component]\tWARNING -- base component updater being used\n");
+    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[component]\tWARNING -- base component updater being used\n");
 }
 ////////////////////////////
 
 // MOVEMENT COMPONENT //////
-Movement_C::Movement_C(std::pair<int,int> *_pos, CConsoleLoggerEx *_debugconsole, int blockingLevel) : Component (MOVE_C, _debugconsole) {
+Movement_C::Movement_C(std::pair<int,int> *_pos, CConsoleLoggerEx *_debugconsole, int blockingLevel) : Component (MOVE_C, _debugconsole), astar(_debugconsole) {
     astar.block_level = blockingLevel;
     astar.useDiag = true;
     astar.useMomentum = false;
@@ -42,19 +42,19 @@ void Movement_C::Wander(Being *self) {
 void Movement_C::Move(Being *self) {
     if (self->moveto.first != -1 && self->moveto.second != -1) {
         std::vector<std::pair<int,int>> Path;
-        DEBUG_CONSOLE->cprintf("[move c]\tFrom: (%d,%d) to (%d,%d)\n", self->pos.first, self->pos.second, self->moveto.first, self->moveto.second);
+        if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tFrom: (%d,%d) to (%d,%d)\n", self->pos.first, self->pos.second, self->moveto.first, self->moveto.second);
         // for (int i=0; i<MAP_ROWS; i++) {
         //     for (int j=0; j<MAP_COLS; j++) {
         //         DEBUG_CONSOLE->cprintf("%d", (*self).currBlockingArray[i][j]);
         //     }
         // }
-        if (self->currBlockingArray != nullptr && astar.astar(*(self->currBlockingArray), self->pos, self->moveto, Path, DEBUG_CONSOLE)) {
+        if (astar.astar(*(self->currBlockingArray), self->pos, self->moveto, Path)) {
             // path success
-            DEBUG_CONSOLE->cprintf("[move c]\tMoving being (%d,%d)\n", Path[0].first, Path[0].second);
+            if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tMoving being (%d,%d)\n", Path[0].first, Path[0].second);
             self->pos.first = Path[Path.size()-2].first;
             self->pos.second = Path[Path.size()-2].second;
         } else {
-            DEBUG_CONSOLE->cprintf("[move c]\tAstar failure!!\n");
+            if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tAstar failure!!\n");
             // after a max amount of tries put the being back into a new state
             if (PathFailedCounter.second - 1 <= 0) {
                 self->thought = NO_THOT;
@@ -162,7 +162,7 @@ bool Build_C::init(Jobs job) {
             if (valid) break;
         }
         if (!isBuildValid()) {
-            DEBUG_CONSOLE->cprintf("[build c]\tFailed to pick build\n");
+            if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tFailed to pick build\n");
             return false;
         }
     }
@@ -173,9 +173,8 @@ bool Build_C::init(Jobs job) {
     room.wallPoints = WallPoints;
     room.floorPoints = FloorPoints;
     Construct *roomptr = &room;
-    if (worldBuildListPtr != nullptr) worldBuildListPtr->push_back(roomptr);
-    else DEBUG_CONSOLE->cprintf("build c]\t**Error no world ptr**\n");
-    DEBUG_CONSOLE->cprintf("[build c]\tBuild picked at (%d,%d)\n", BuildLocation.first, BuildLocation.second);
+    worldBuildListPtr->push_back(roomptr);
+    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tBuild picked at (%d,%d)\n", BuildLocation.first, BuildLocation.second);
     return true;
 }
 
@@ -196,9 +195,9 @@ void Build_C::Update(Being *self) {
 }
 
 // finds all the points for walls
-void Build_C::findWallPoints() {
-    WallPoints.clear();
-    DEBUG_CONSOLE->cprintf("[build c]\tTrying (%d,%d) w:%d h:%d\n", BuildLocation.first, BuildLocation.second, BuildSize.first, BuildSize.second);
+void Build_C::findBuildPoints() {
+    BuildPoints.clear();
+    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tTrying (%d,%d) w:%d h:%d\n", BuildLocation.first, BuildLocation.second, BuildSize.first, BuildSize.second);
     // top row
     for (int i=0; i<BuildSize.first; i++) {
         std::pair<int,int> top;
@@ -254,8 +253,9 @@ bool Build_C::placeBlock(Being *self) {
                 // add material point to room
                 PointStruct wall = material;
                 room.PointStructs.push_back(wall);
-                (*self->currConstructArray)[WallPoints[0].first][WallPoints[0].second] = 1;
-                WallPoints.erase(WallPoints.begin());
+                (*self->currConstructArray)[BuildPoints[0].first][BuildPoints[0].second] = 1;
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tconstruct array @ (%d,%d) = %d\n", BuildPoints[0].first, BuildPoints[0].second, (*(self->currConstructArray))[BuildPoints[0].first][BuildPoints[0].second]);
+                BuildPoints.erase(BuildPoints.begin());
                 return true;
             } else {
                 // being is not at point - moveto it

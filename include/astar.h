@@ -40,6 +40,11 @@ class Astar {
             R = MAP_ROWS;
             C = MAP_COLS;
         }
+        Astar(CConsoleLoggerEx *_debugconsole) {
+            R = MAP_ROWS;
+            C = MAP_COLS;
+            DEBUG_CONSOLE = _debugconsole;
+        }
         Astar(std::pair<int,int> _worldsz) {
             R = _worldsz.first;
             C = _worldsz.second;
@@ -49,12 +54,13 @@ class Astar {
         int block_level;
         bool useDiag;
         bool useMomentum;
+        CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
         bool isValid(std::pair<int,int> point);
         bool isUnBlocked(std::vector<std::vector<int>> grid, std::pair<int,int> point);
         bool isDestination(std::pair<int,int> position, std::pair<int,int> dest);
         double calculateHValue(std::pair<int,int> src, std::pair<int,int> dest);
         void tracePath(Cell cellDetails[], std::pair<int,int> dest, int C, std::vector<std::pair<int,int>> &Path); 
-        bool astar(std::vector<std::vector<int>> grid, std::pair<int,int> src, std::pair<int,int> dest, std::vector<std::pair<int,int>> &Path, CConsoleLoggerEx *_debugconsole);
+        bool astar(std::vector<std::vector<int>> grid, std::pair<int,int> src, std::pair<int,int> dest, std::vector<std::pair<int,int>> &Path);
 };
 
 

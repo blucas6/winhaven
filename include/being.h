@@ -25,7 +25,7 @@ class Being {
         std::vector<Thoughts> thought_list;                 // all possible thoughts
         bool newthought = false;                            // dictates whether or not to pick a new thought
         std::vector<Component*> ComponentList;
-        CConsoleLoggerEx *DEBUG_CONSOLE;
+        CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
         std::vector<std::vector<int>> *currBlockingArray = nullptr;   // pointer to the current turns blocking_array for astar
         std::vector<std::vector<int>> *currConstructArray = nullptr;   // pointer to the mapslices construction array - used to update build pts
 

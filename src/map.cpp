@@ -108,6 +108,11 @@ void MapSlice::cleanBlockingArray() {
     }
 }
 
+MapSlice::MapSlice() : land_array(MAP_ROWS, std::vector<int>(MAP_COLS)), 
+land_pieces(MAP_ROWS, std::vector<Land>(MAP_COLS)), blocking_array(MAP_ROWS, std::vector<int>(MAP_COLS)), construct_array(MAP_ROWS, std::vector<int>(MAP_COLS)) {
+
+}
+
 MapSlice::MapSlice(CConsoleLoggerEx *_debugconsole) : land_array(MAP_ROWS, std::vector<int>(MAP_COLS)), 
 land_pieces(MAP_ROWS, std::vector<Land>(MAP_COLS)), blocking_array(MAP_ROWS, std::vector<int>(MAP_COLS)), construct_array(MAP_ROWS, std::vector<int>(MAP_COLS)) {
     DEBUG_CONSOLE = _debugconsole;
@@ -126,7 +131,7 @@ void MapSlice::mapGen() {
     cleanConstructArray();
     generateTowns();
     generateCreatures();
-    DEBUG_CONSOLE->cprintf("[map]\tmap gen DONE\n");
+    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[map]\tmap gen DONE\n");
 }
 
 void MapSlice::generateCreatures() {
