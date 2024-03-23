@@ -90,6 +90,15 @@ void MapSlice::generateLand() {
     }
 }
 
+void MapSlice::cleanConstructArray() {
+    // clear the array of all non moveable structures
+    for (int i=0; i<MAP_ROWS; i++) {
+        for (int j=0; j<MAP_COLS; j++) {
+            construct_array[i][j] = 0;
+        }
+    }
+}
+
 void MapSlice::cleanBlockingArray() {
     // clear the array of all non passable objects
     for (int i=0; i<MAP_ROWS; i++) {
@@ -100,7 +109,7 @@ void MapSlice::cleanBlockingArray() {
 }
 
 MapSlice::MapSlice(CConsoleLoggerEx *_debugconsole) : land_array(MAP_ROWS, std::vector<int>(MAP_COLS)), 
-land_pieces(MAP_ROWS, std::vector<Land>(MAP_COLS)), blocking_array(MAP_ROWS, std::vector<int>(MAP_COLS)) {
+land_pieces(MAP_ROWS, std::vector<Land>(MAP_COLS)), blocking_array(MAP_ROWS, std::vector<int>(MAP_COLS)), construct_array(MAP_ROWS, std::vector<int>(MAP_COLS)) {
     DEBUG_CONSOLE = _debugconsole;
 }
 
@@ -114,6 +123,7 @@ void MapSlice::mapGen() {
     generateLand();
     getMapGlyphs();
     cleanBlockingArray();
+    cleanConstructArray();
     generateCreatures();
     DEBUG_CONSOLE->cprintf("[map]\tmap gen DONE\n");
 }
@@ -125,7 +135,7 @@ void MapSlice::generateCreatures() {
     for(int i=0; i<humanAmount; i++) {
         pos = {rand() % MAP_ROWS, rand() % MAP_COLS};
         job = jobtypes[rand() % jobtypes.size()];
-        CreatureList.push_back(new Human(pos, job, &BuildingList, DEBUG_CONSOLE, &blocking_array));
+        CreatureList.push_back(new Human(pos, job, &BuildingList, DEBUG_CONSOLE, &blocking_array, &construct_array));
     }
 }
 
@@ -152,11 +162,7 @@ void MapSlice::getMapGlyphs() {
 
 void MapSlice::updateBlockingArray() {
     // add construction points to blocking array
-    for (const Construct* el: BuildingList) {
-        for (auto pt: el->PointStructs) {
-            blocking_array[pt.pos.first][pt.pos.second] = pt.blockingLevel;
-        }
-    }
+    blocking_array = construct_array;
     // add creature points to blocking array
     for (int i=0; i<CreatureList.size(); i++) {
         blocking_array[CreatureList[i]->pos.first][CreatureList[i]->pos.second] = 1;
@@ -168,7 +174,7 @@ void MapSlice::Update() {
     for (int i=0; i<CreatureList.size(); i++) {
         cleanBlockingArray();
         updateBlockingArray();
-        CreatureList[i]->Update(&blocking_array);
+        CreatureList[i]->Update();
     }
 }
 //////////////////////////////////////////////////////

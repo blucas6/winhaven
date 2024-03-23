@@ -234,6 +234,8 @@ bool Build_C::placeBlock(Being *self) {
                 // add material point to room
                 PointStruct wall = material;
                 room.PointStructs.push_back(wall);
+                (*self->currConstructArray)[BuildPoints[0].first][BuildPoints[0].second] = 1;
+                DEBUG_CONSOLE->cprintf("[build c]\tconstruct array @ (%d,%d) = %d\n", BuildPoints[0].first, BuildPoints[0].second, (*(self->currConstructArray))[BuildPoints[0].first][BuildPoints[0].second]);
                 BuildPoints.erase(BuildPoints.begin());
                 return true;
             } else {
