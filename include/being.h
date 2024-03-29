@@ -5,6 +5,7 @@
 #include "construct.h"
 #include "ConsoleLogger.h"
 #include "graphics.h"
+#include "land.h"
 
 class Town;
 
@@ -39,7 +40,7 @@ class Being {
 
 class Human : public Being {
     public:
-        Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array);
+        Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array);
 };
 
 #endif

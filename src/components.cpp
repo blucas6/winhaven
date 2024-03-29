@@ -80,12 +80,12 @@ void Job_C::Update(Being *self) {
 
 ////////////////////////////
 
-Build_C::Build_C(std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debugconsole) : Component(BUILD_C, _debugconsole), room("room") {
+Build_C::Build_C(std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole) : Component(BUILD_C, _debugconsole), room("room", _debugconsole) {
     worldBuildListPtr = buildingListp;
+    landPiecesPtr = _landPiecesPtr;
     material.color = FG_YELLOW;
     material.glyph = '0';
     material.blockingLevel = 1;
-    DEBUG_CONSOLE = _debugconsole;
 }
 
 // Checks if build is overlapping with anything
@@ -96,6 +96,12 @@ bool Build_C::isBuildValid() {
             return false;
         }
     }
+    for (int i=0; i<GardenPoints.size(); i++) {
+        if (GardenPoints[i].first < 0 || GardenPoints[i].second < 0 || GardenPoints[i].first >= MAP_ROWS || GardenPoints[i].second >= MAP_COLS) {
+            return false;
+        }
+    }
+
     // go through all builds
     for (const Construct* el: *worldBuildListPtr) {
         // cycle through all wall pts in construct
@@ -114,6 +120,14 @@ bool Build_C::isBuildValid() {
                 }
             }
         }
+        // go through garden points
+        for (int b=0; b<el->gardenPoints.size(); b++) {
+            for (int i=0; i<GardenPoints.size(); i++) {
+                if (el->gardenPoints[b].first == GardenPoints[i].first && el->gardenPoints[b].second == GardenPoints[i].second) {
+                    return false;
+                }
+            }
+        }
     }
     return true;
 }
@@ -123,27 +137,29 @@ bool Build_C::init(Jobs job) {
     switch (job) {
         case FARMER:
             name = "Farm";
-            maxBuildsz = {10,10};
+            maxBuildsz = FARM_SZ_MAX;
+            needGarden = true;
+            maxGardensz = FARM_GARDEN_SZ_MAX;
             break;
         case BREWER:
             name = "Alehouse";
-            maxBuildsz = {10,10};
+            maxBuildsz = ALEHOUSE_SZ_MAX;
             break;
         case PRIEST:
             name = "Church";
-            maxBuildsz = {10,10};
+            maxBuildsz = CHURCH_SZ_MAX;
             break;
         default:
             name = "House";
-            maxBuildsz = {10,10};
+            maxBuildsz = HOUSE_SZ_MAX;
             break;
     }
 
-    BuildLocation.first = rand() % (MAP_ROWS-maxBuildsz.first-1);
-    BuildLocation.second = rand() % (MAP_COLS-maxBuildsz.second-1);
-    BuildSize.first = 3 + rand() % maxBuildsz.first;
-    BuildSize.second = 3 + rand() % maxBuildsz.second;
-    findWallPoints();
+    BuildLocation.first = rand() % (MAP_ROWS-maxBuildsz-1);
+    BuildLocation.second = rand() % (MAP_COLS-maxBuildsz-1);
+    BuildSize.first = MINIMUM_BUILD_SZ + rand() % maxBuildsz;
+    BuildSize.second = MINIMUM_BUILD_SZ + rand() % maxBuildsz;
+    findBuildPoints();
     if (!isBuildValid()) {
         bool valid = false;
         for (int m=0; m<max_shimmy.first; m++) {
@@ -151,7 +167,7 @@ bool Build_C::init(Jobs job) {
                 for (int c=-1; c<2; c++) {
                     BuildLocation.first += r+m;
                     BuildLocation.second += c+m;
-                    findWallPoints();
+                    findBuildPoints();
                     if (isBuildValid()) {
                         valid = true;
                         break;
@@ -172,6 +188,7 @@ bool Build_C::init(Jobs job) {
     room.type = name;
     room.wallPoints = WallPoints;
     room.floorPoints = FloorPoints;
+    room.gardenPoints = GardenPoints;
     Construct *roomptr = &room;
     worldBuildListPtr->push_back(roomptr);
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tBuild picked at (%d,%d)\n", BuildLocation.first, BuildLocation.second);
@@ -195,42 +212,83 @@ void Build_C::Update(Being *self) {
 }
 
 // finds all the points for walls
-void Build_C::findWallPoints() {
+void Build_C::findBuildPoints() {
     WallPoints.clear();
+    GardenPoints.clear();
+    FloorPoints.clear();
+
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tTrying (%d,%d) w:%d h:%d\n", BuildLocation.first, BuildLocation.second, BuildSize.first, BuildSize.second);
+    
     // top row
     for (int i=0; i<BuildSize.first; i++) {
-        std::pair<int,int> top;
-        top.first = BuildLocation.first + 0;
-        top.second = BuildLocation.second + i;
-        WallPoints.push_back(top);
+        WallPoints.push_back(std::make_pair(BuildLocation.first + 0, BuildLocation.second + i));
+    }
+
+    // right col
+    for (int i=1; i<BuildSize.second-1; i++) {
+        WallPoints.push_back(std::make_pair(BuildLocation.first + i, BuildLocation.second + BuildSize.first - 1 + 0));
+
     }
     // bottom row
     for (int i=0; i<BuildSize.first; i++) {
-        std::pair<int,int> bot;
-        bot.first = BuildLocation.first + BuildSize.second - 1 + 0;
-        bot.second = BuildLocation.second + i;
-        WallPoints.push_back(bot);
+        WallPoints.push_back(std::make_pair(BuildLocation.first + BuildSize.second - 1 + 0, BuildLocation.second + i));
     }
+
     // left col
     for (int i=1; i<BuildSize.second-1; i++) {
-        std::pair<int,int> left;
-        left.first = BuildLocation.first + i;
-        left.second = BuildLocation.second + 0;
-        WallPoints.push_back(left);
-    }            
-    // right col
-    for (int i=1; i<BuildSize.second-1; i++) {
-        std::pair<int,int> right;
-        right.first = BuildLocation.first + i;
-        right.second = BuildLocation.second + BuildSize.first - 1 + 0;
-        WallPoints.push_back(right);
+        WallPoints.push_back(std::make_pair(BuildLocation.first + i, BuildLocation.second + 0));
     }
 
     // find floor points
-    for (int i=BuildLocation.first+1; i<BuildSize.first-1; i++) {
-        for (int j=BuildLocation.second+1; j<BuildSize.second-1; j++) {
+    for (int i=BuildLocation.first+1; i<BuildLocation.first+BuildSize.second-1; i++) {
+        for (int j=BuildLocation.second+1; j<BuildLocation.second+BuildSize.first-1; j++) {
             FloorPoints.push_back(std::make_pair(i,j));
+        }
+    }
+
+    if (needGarden) {
+        std::pair<int,int> buildpt = WallPoints[rand() % WallPoints.size()];
+        int side = -1;
+        // top row
+        for (int i=0; i<BuildSize.first; i++) {
+            std::pair<int,int> top = {BuildLocation.first + 0, BuildLocation.second + i};
+            if (buildpt == top) side = 1;
+        }
+        // bottom row
+        for (int i=0; i<BuildSize.first; i++) {
+            std::pair<int,int> bot = {BuildLocation.first + BuildSize.second - 1 + 0, BuildLocation.second + i};
+            if (buildpt == bot) side = 2;
+        }
+        // left col
+        for (int i=1; i<BuildSize.second-1; i++) {
+            std::pair<int,int> left = {BuildLocation.first + i, BuildLocation.second + 0};
+            if (buildpt == left) side = 3;
+        }            
+        // right col
+        for (int i=1; i<BuildSize.second-1; i++) {
+            std::pair<int,int> right = {BuildLocation.first + i, BuildLocation.second + BuildSize.first - 1 + 0};
+            if (buildpt == right) side = 4;
+        }
+        if (side != -1) {
+            garden_size = { FARM_GARDEN_SZ_MIN + rand() % FARM_GARDEN_SZ_MAX, FARM_GARDEN_SZ_MIN + rand() % FARM_GARDEN_SZ_MAX};
+            // garden is on top
+            if (side == 1) garden_pos = {buildpt.first - 1 - garden_size.first, buildpt.second};
+            // bottom side
+            else if (side == 2) garden_pos = {buildpt.first + 1 + garden_size.first, buildpt.second};
+            // left side
+            else if (side == 3) garden_pos = {buildpt.first, buildpt.second - 1 - garden_size.second};
+            // right side
+            else if (side == 4) garden_pos = {buildpt.first, buildpt.second + 1 + garden_size.second};
+            
+            // fill in the rest of the garden
+            for (int i=0; i<garden_size.first; i++) {
+                for (int j=0; j<garden_size.second; j++) {
+                    GardenPoints.push_back(std::make_pair(garden_pos.first+i, garden_pos.second+j));
+                }
+            }
+        }
+        if (GardenPoints.size() > 0) {
+            if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tGarden picked! pts (%d)\n", GardenPoints.size());
         }
     }
 }
@@ -254,23 +312,45 @@ bool Build_C::placeBlock(Being *self) {
                 PointStruct wall = material;
                 room.PointStructs.push_back(wall);
                 (*self->currConstructArray)[WallPoints[0].first][WallPoints[0].second] = 1;
-                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tconstruct array @ (%d,%d) = %d\n", WallPoints[0].first, WallPoints[0].second, (*(self->currConstructArray))[WallPoints[0].first][WallPoints[0].second]);
                 WallPoints.erase(WallPoints.begin());
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tPlaced wall!\n");
                 return true;
             } else {
                 // being is not at point - moveto it
                 self->moveto.first = WallPoints[0].first;
                 self->moveto.second = WallPoints[0].second;
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tMoving to wall\n");
                 return true;
             }
         } else {
             // failure to finish the room - offscreen error
+            if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tError - wall out of range\n");
+            needtobuild = false;
+            return false;
+        }
+    }
+    if (GardenPoints.size() > 0) {
+        if (GardenPoints[0].first < MAP_ROWS && GardenPoints[0].second < MAP_COLS && GardenPoints[0].first > -1 && GardenPoints[0].second > -1) {
+            if (distCheck(self->pos, GardenPoints[0]) && landPiecesPtr != nullptr) {
+                (*landPiecesPtr)[GardenPoints[0].first][GardenPoints[0].second].ungrowth();
+                GardenPoints.erase(GardenPoints.begin());
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tPlaced garden pt!\n");
+                return true;
+            } else {
+                self->moveto.first = GardenPoints[0].first;
+                self->moveto.second = GardenPoints[0].second;
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tMoving to garden\n");
+                return true;
+            }
+        } else {
+            if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tError - garden out of range\n");
             needtobuild = false;
             return false;
         }
     }
     // finished build
+    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tFINISHING ROOM\n");
     needtobuild = false;
-    room.Finish(DEBUG_CONSOLE);
+    room.Finish(needGarden);
     return false; 
 }

@@ -46,11 +46,11 @@ void Being::Update() {
     }
 }
 
-Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array) 
+Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array) 
 : Being("Human", '@', FG_WHITE, _pos, _debugconsole, blocking_array, construct_array) {
     // give a human a job component
     ComponentList.push_back(new Job_C(_job, _debugconsole));
-    ComponentList.push_back(new Build_C(buildingListp, _debugconsole));
+    ComponentList.push_back(new Build_C(buildingListp, _landPiecesPtr, _debugconsole));
     if ( ((Build_C*)ComponentList.back())->init(_job) ) {
         thought_list.push_back(BUILD);
     }
