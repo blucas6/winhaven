@@ -28,4 +28,9 @@ enum ComponentID {
     BUILD_C
 };
 
+enum Furniture {
+    TABLE,
+    CHAIR
+};
+
 #endif

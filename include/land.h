@@ -22,12 +22,14 @@ class LandTile {
 class Land {
     public:
         Land(); // need default for map array
-        Land(LandTile ground, LandTile plant);
+        Land(LandTile ground, LandTile plant, LandTile tilled);
         LandTile current;
         LandTile ground;
         LandTile plant;
+        LandTile tilled;
         void growth();
         void ungrowth();
+        void till();
 };
 
 class Dirt : public LandTile {
@@ -48,6 +50,11 @@ class Grass : public LandTile {
 class Moss : public LandTile {
     public:
         Moss();
+};
+
+class Tilled : public LandTile {
+    public:
+        Tilled();
 };
 
 #endif

@@ -13,6 +13,12 @@
     basic unit is a construct, which the pointstruct it holds can be updated dynamically
     room is a special construct that cleans up the look when finished
 
+# builds 
+    0----0  w:6 h:4 
+    |    |  it will be built by going
+    |    |  (0 to 5) 0----0, (1 to 2) | |
+    0----0  (5 to 0) 0----0, (2 to 1) | |
+
 # Land
     Landtiles represent a section of Land
     Land is represent by

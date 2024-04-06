@@ -31,14 +31,17 @@ Land::Land() {
     ground = default_tile;
     plant = default_tile;
     current = default_tile;
+    tilled = default_tile;
 }
 
-Land::Land(LandTile _ground, LandTile _plant) {
+Land::Land(LandTile _ground, LandTile _plant, LandTile _tilled) {
     ground = _ground;
     ground.init();
     plant = _plant;
     plant.init();
     current = ground;
+    tilled = _tilled;
+    tilled.init();
 }
 
 void Land::growth() {
@@ -58,6 +61,14 @@ void Land::ungrowth() {
     current.init();
 }
 
+void Land::till() {
+    current.name = tilled.name;
+    current.ID = tilled.ID;
+    current.colors = tilled.colors;
+    current.glyphs = tilled.glyphs;
+    current.init();
+}
+
 // TYPES ///////////////////////////////////
 Dirt::Dirt() : LandTile("Dirt", LAND_ID++, {FG_DARKYELLOW}, {'.'}) {
 
@@ -72,6 +83,10 @@ Grass::Grass() : LandTile("Grass", LAND_ID++, {FG_GREEN}, {'\'', '"', '`', ',', 
 }
 
 Moss::Moss() : LandTile("Moss", LAND_ID++, {FG_DARKGREEN}, {'*'}) {
+
+}
+
+Tilled::Tilled() : LandTile("Tilled land", LAND_ID++, {FG_DARKYELLOW}, {'~'}) {
 
 }
 ////////////////////////////////////////////

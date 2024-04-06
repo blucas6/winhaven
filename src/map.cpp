@@ -46,8 +46,8 @@ void MapSlice::generateTowns() {
 }
 
 void MapSlice::mapGen() {
-    LandBinder.push_back(new Land(Dirt(), Grass()));       // add all land pieces
-    LandBinder.push_back(new Land(Rock(), Moss()));
+    LandBinder.push_back(new Land(Dirt(), Grass(), Tilled()));       // add all land pieces
+    LandBinder.push_back(new Land(Rock(), Moss(), Tilled()));
     generateLand();
     getMapGlyphs();
     cleanBlockingArray();
@@ -66,7 +66,7 @@ void MapSlice::generateCreatures() {
         for(int i=0; i<HUMAN_GEN_AMOUNT; i++) {
             pos = {rand() % MAP_ROWS, rand() % MAP_COLS};
             // job = jobtypes[rand() % jobtypes.size()];
-            job = BREWER;
+            job = FARMER;
             Human *human = new Human(pos, job, &BuildingList, &land_pieces, DEBUG_CONSOLE, &blocking_array, &construct_array);
             human->myTown = &TownList[0];
             TownList[0].CreatureList.push_back(human);

@@ -18,6 +18,7 @@ void Game::UpdateWorld() {
 void Game::PrintScreen() {
     std::vector<Being*> list;
     list.insert(list.end(), world.gMap.CreatureList.begin(), world.gMap.CreatureList.end());
+    // add creatures from towns to print out
     for(int t=0; t<world.gMap.TownList.size(); t++) {
         list.insert(list.end(), world.gMap.TownList[t].CreatureList.begin(), world.gMap.TownList[t].CreatureList.end());
     }
