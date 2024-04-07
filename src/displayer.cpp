@@ -31,12 +31,12 @@ void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vecto
         std::pair<int,int> realpos;
         for (const Construct* el: BuildingList) {
             // cycle through all pts in construct
-            for (auto pt: el->PointStructs) {
-                realpos.first = pt.pos.first - view.first;
-                realpos.second = pt.pos.second - view.second;
+            for (int i=0; i<el->Structures.size(); i++) {
+                realpos.first = el->Structures[i]->pos.first - view.first;
+                realpos.second = el->Structures[i]->pos.second - view.second;
                 if (realpos.first>=0 && realpos.first<SCREEN_R && realpos.second>=0 && realpos.second<SCREEN_C) {
-                    buffer[realpos.first][realpos.second].Char.AsciiChar = pt.glyph;
-                    buffer[realpos.first][realpos.second].Attributes = pt.color;
+                    buffer[realpos.first][realpos.second].Char.AsciiChar = el->Structures[i]->glyph;
+                    buffer[realpos.first][realpos.second].Attributes = el->Structures[i]->color;
                 }
             }
         }

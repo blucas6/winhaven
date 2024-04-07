@@ -1,4 +1,5 @@
 #include "components.h"
+#include <memory>
 
 // BASE CLASS //////////////
 Component::Component(ComponentID _ID, CConsoleLoggerEx *_debugconsole) {
@@ -50,9 +51,21 @@ void Movement_C::Move(Being *self) {
         // }
         if (astar.astar(*(self->currBlockingArray), self->pos, self->moveto, Path)) {
             // path success
-            if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tMoving being (%d,%d)\n", Path[0].first, Path[0].second);
-            self->pos.first = Path[Path.size()-2].first;
-            self->pos.second = Path[Path.size()-2].second;
+            // check for door pt
+            if ((*self->currBlockingArray)[Path[0].first][Path[0].second] == DOOR_PT_LEVEL) {
+                // try to open door
+                try {
+                    if ((*self->currPTArray)[Path[0].first][Path[0].second]->name == "door") {
+                        (*self->currPTArray)[Path[0].first][Path[0].second]->Open();
+                    } else if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\t**Door in path but no door to open!!**\n");
+                } catch (...) {
+                    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\t***FAILED WHEN CHECKING FOR DOOR!***\n");    
+                }
+            } else {
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tMoving being (%d,%d)\n", Path[0].first, Path[0].second);
+                self->pos.first = Path[Path.size()-2].first;
+                self->pos.second = Path[Path.size()-2].second;
+            }
         } else {
             if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tAstar failure!!\n");
             // after a max amount of tries put the being back into a new state
@@ -81,11 +94,8 @@ void Job_C::Update(Being *self) {
 ////////////////////////////
 
 Build_C::Build_C(std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole) : Component(BUILD_C, _debugconsole), room("room", _debugconsole) {
-    worldBuildListPtr = buildingListp;
+    mapBuildListPtr = buildingListp;
     landPiecesPtr = _landPiecesPtr;
-    material.color = FG_YELLOW;
-    material.glyph = '0';
-    material.blockingLevel = 1;
 }
 
 // Checks if build is overlapping with anything
@@ -108,7 +118,7 @@ bool Build_C::isBuildValid() {
     trypts.insert(trypts.end(), FloorPoints.begin(), FloorPoints.end());
     trypts.insert(trypts.end(), GardenPoints.begin(), GardenPoints.end());
     // go through all builds
-    for (const Construct* el: *worldBuildListPtr) {
+    for (const Construct* el: *mapBuildListPtr) {
         // concatenate all wall pts floor pts and garden pts
         std::vector<std::pair<int,int>> currentStructs;
         currentStructs.insert(currentStructs.end(), el->wallPoints.begin(), el->wallPoints.end());
@@ -124,7 +134,7 @@ bool Build_C::isBuildValid() {
 }
 
 // Initialize a build type depending on the job
-bool Build_C::init(Jobs job) {
+bool Build_C::init(Being *self, Jobs job) {
     switch (job) {
         case FARMER:
             name = "Farm";
@@ -180,8 +190,8 @@ bool Build_C::init(Jobs job) {
     room.wallPoints = WallPoints;
     room.floorPoints = FloorPoints;
     room.gardenPoints = GardenPoints;
-    Construct *roomptr = &room;
-    worldBuildListPtr->push_back(roomptr);
+    room.currConstructArray = self->currConstructArray;
+    mapBuildListPtr->push_back(&room);
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\t=Build picked at (%d,%d)=\n\n", BuildLocation.first, BuildLocation.second);
     return true;
 }
@@ -312,13 +322,12 @@ bool Build_C::placeBlock(Being *self) {
             // check if being is next to point
             if (distCheck(self->pos, WallPoints[0]) && self->currConstructArray != nullptr) {
                 // define points for material
-                material.pos.first = WallPoints[0].first;
-                material.pos.second = WallPoints[0].second;
+                Material *material = new Material();
+                material->pos = WallPoints[0];
                 // add material point to room
-                PointStruct wall = material;
-                room.PointStructs.push_back(wall);
-                (*self->currConstructArray)[WallPoints[0].first][WallPoints[0].second] = 1;
+                room.Structures.push_back(material);
                 WallPoints.erase(WallPoints.begin());
+                self->addConstruct(material);            
                 if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tPlaced wall!\n");
                 return true;
             } else {
@@ -328,7 +337,7 @@ bool Build_C::placeBlock(Being *self) {
                 if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tMoving to wall\n");
                 return true;
             }
-        } else {
+        } else { 
             // failure to finish the room - offscreen error
             if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tError - wall out of range\n");
             needtobuild = false;

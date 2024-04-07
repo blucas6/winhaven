@@ -1,9 +1,10 @@
 #include "being.h"
 #include "components.h"
+#include <memory>
 
 short BEING_ID = 1;
 
-Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array) {
+Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<PointStruct*>> *pointstruct_array) {
     ID = BEING_ID++;
     type = t;
     glyph = gly;
@@ -18,6 +19,7 @@ Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLo
     laziness.second = laziness.first;
     currBlockingArray = blocking_array;
     currConstructArray = construct_array; 
+    currPTArray = pointstruct_array;
 }
 
 void Being::NewThought() {
@@ -46,12 +48,22 @@ void Being::Update() {
     }
 }
 
-Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array) 
-: Being("Human", '@', FG_WHITE, _pos, _debugconsole, blocking_array, construct_array) {
+void Being::addConstruct(PointStruct *pt) {
+    (*currConstructArray)[pt->pos.first][pt->pos.second] = pt->blockingLevel;
+    (*currPTArray)[pt->pos.first][pt->pos.second] = pt;
+}
+
+void Being::removeConstruct(std::pair<int,int> pt) {
+    (*currConstructArray)[pt.first][pt.second] = 0;
+    (*currPTArray)[pt.first][pt.second] = new PointStruct();
+}
+
+Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<PointStruct*>> *pointstruct_array) 
+: Being("Human", '@', FG_WHITE, _pos, _debugconsole, blocking_array, construct_array, pointstruct_array) {
     // give a human a job component
     ComponentList.push_back(new Job_C(_job, _debugconsole));
     ComponentList.push_back(new Build_C(buildingListp, _landPiecesPtr, _debugconsole));
-    if ( ((Build_C*)ComponentList.back())->init(_job) ) {
+    if ( ((Build_C*)ComponentList.back())->init(this,_job) ) {
         thought_list.push_back(BUILD);
     }
     ComponentList.push_back(new Movement_C(&pos, _debugconsole, blockingLevel));

@@ -17,4 +17,6 @@
 
 #define HUMAN_GEN_AMOUNT 5
 
+#define DOOR_PT_LEVEL -1    // used to determine if there is a door in the path
+
 #endif

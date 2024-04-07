@@ -13,7 +13,7 @@ class Component;
 
 class Being {
     public:
-        Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array);
+        Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<PointStruct*>> *pointstruct_array);
         int ID;
         std::string type;
         char glyph;
@@ -27,8 +27,9 @@ class Being {
         bool newthought = false;                            // dictates whether or not to pick a new thought
         std::vector<Component*> ComponentList;
         CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
-        std::vector<std::vector<int>> *currBlockingArray = nullptr;   // pointer to the current turns blocking_array for astar
-        std::vector<std::vector<int>> *currConstructArray = nullptr;   // pointer to the mapslices construction array - used to update build pts
+        std::vector<std::vector<int>> *currBlockingArray = nullptr;     // pointer to the current turns blocking_array for astar
+        std::vector<std::vector<int>> *currConstructArray = nullptr;    // pointer to the mapslices construction array - used to update build pts
+        std::vector<std::vector<PointStruct*>> *currPTArray = nullptr;           // pointer to the mapslices pointstructs map - used for accessing specific structures by index
 
         Town *myTown = nullptr;
 
@@ -36,11 +37,14 @@ class Being {
 
         virtual void NewThought();
         virtual void Update();
+        void addConstruct(PointStruct *pt);
+        void removeConstruct(std::pair<int,int> pt);
+        void updateConstruct(std::pair<int,int> pt);
 };
 
 class Human : public Being {
     public:
-        Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array);
+        Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<PointStruct*>> *pointstruct_array);
 };
 
 #endif
