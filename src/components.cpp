@@ -1,5 +1,4 @@
 #include "components.h"
-#include <memory>
 
 // BASE CLASS //////////////
 Component::Component(ComponentID _ID, CConsoleLoggerEx *_debugconsole) {
@@ -34,10 +33,39 @@ void Movement_C::Wander(Being *self) {
     p.second = self->pos.second + choices[c][1];
     if (self->currBlockingArray != nullptr) {
         if (astar.isValid(p) && astar.isUnBlocked((*self->currBlockingArray), p)) {
-            self->pos.first += choices[c][0];
-            self->pos.second += choices[c][1];
+            DoorAction da = CheckForDoor(self, p);
+            if (da == NO_DOOR) {          
+                self->pos.first += choices[c][0];
+                self->pos.second += choices[c][1];
+            }
         }
     }
+}
+
+DoorAction Movement_C::CheckForDoor(Being *self, std::pair<int,int> pt) {
+    // returns TRUE when door was opened
+    // returns FALSE when door was not found or not opened
+    if (self->currPTArray == nullptr) {
+        if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\t***PT ARRAY Empty!!***\n");    
+        return DOOR_FAIL;
+    }
+    if ((*self->currBlockingArray)[pt.first][pt.second] == DOOR_PT_LEVEL) {
+        if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tFound door in path\n");
+        // try to open door
+        try {
+            if ((*self->currPTArray)[pt.first][pt.second]->type == PT_DOOR_H || (*self->currPTArray)[pt.first][pt.second]->type == PT_DOOR_V) {
+                (*self->currPTArray)[pt.first][pt.second]->Open();
+                (*self->currConstructArray)[pt.first][pt.second] = (*self->currPTArray)[pt.first][pt.second]->blockingLevel;
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tOpened door - BL:%d new blocking lv:%d\n", (*self->currPTArray)[pt.first][pt.second]->blockingLevel, (*self->currConstructArray)[pt.first][pt.second]);
+                return DOOR_OPENED;
+            } else if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\t**Door in path but no door to open!! (%d)**\n", (*self->currPTArray)[pt.first][pt.second]->type);
+        } catch (...) {
+            if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\t***FAILED WHEN CHECKING FOR DOOR!***\n");    
+        }
+    } else {
+        return NO_DOOR;
+    }
+    return DOOR_FAIL;
 }
 
 void Movement_C::Move(Being *self) {
@@ -49,35 +77,33 @@ void Movement_C::Move(Being *self) {
         //         DEBUG_CONSOLE->cprintf("%d", (*self).currBlockingArray[i][j]);
         //     }
         // }
-        if (astar.astar(*(self->currBlockingArray), self->pos, self->moveto, Path)) {
+        if (self->currBlockingArray != nullptr && astar.astar(*(self->currBlockingArray), self->pos, self->moveto, Path)) {
             // path success
             // check for door pt
-            if ((*self->currBlockingArray)[Path[0].first][Path[0].second] == DOOR_PT_LEVEL) {
-                // try to open door
-                try {
-                    if ((*self->currPTArray)[Path[0].first][Path[0].second]->name == "door") {
-                        (*self->currPTArray)[Path[0].first][Path[0].second]->Open();
-                    } else if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\t**Door in path but no door to open!!**\n");
-                } catch (...) {
-                    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\t***FAILED WHEN CHECKING FOR DOOR!***\n");    
-                }
-            } else {
-                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tMoving being (%d,%d)\n", Path[0].first, Path[0].second);
+            DoorAction da = CheckForDoor(self, Path[Path.size()-2]);
+            if (da == NO_DOOR) {
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tMoving being to dest (%d,%d)\n", Path[0].first, Path[0].second);
                 self->pos.first = Path[Path.size()-2].first;
                 self->pos.second = Path[Path.size()-2].second;
+            } else if (da == DOOR_FAIL) {
+                PathFailure(self);
             }
         } else {
-            if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tAstar failure!!\n");
-            // after a max amount of tries put the being back into a new state
-            if (PathFailedCounter.second - 1 <= 0) {
-                self->thought = NO_THOT;
-                PathFailedCounter.second = PathFailedCounter.first;
-            } else 
-                PathFailedCounter.second--;
+            PathFailure(self);
         }
         self->moveto.first = -1;
         self->moveto.second = -1;
     }
+}
+
+void Movement_C::PathFailure(Being *self) {
+    // trigger a path fail whenever being fails to move
+    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[move c]\tAstar failure!!\n");
+    // after a max amount of tries put the being back into a new state
+    if (PathFailedCounter.second - 1 <= 0) {
+        self->thought = NO_THOT;
+        PathFailedCounter.second = PathFailedCounter.first;
+    } else PathFailedCounter.second--;
 }
 
 ////////////////////////////
@@ -190,6 +216,7 @@ bool Build_C::init(Being *self, Jobs job) {
     room.wallPoints = WallPoints;
     room.floorPoints = FloorPoints;
     room.gardenPoints = GardenPoints;
+    room.currPointStruct_Array = self->currPTArray;
     room.currConstructArray = self->currConstructArray;
     mapBuildListPtr->push_back(&room);
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\t=Build picked at (%d,%d)=\n\n", BuildLocation.first, BuildLocation.second);
@@ -321,14 +348,10 @@ bool Build_C::placeBlock(Being *self) {
         if (WallPoints[0].first < MAP_ROWS && WallPoints[0].second < MAP_COLS && WallPoints[0].first > -1 && WallPoints[0].second > -1) {
             // check if being is next to point
             if (distCheck(self->pos, WallPoints[0]) && self->currConstructArray != nullptr) {
-                // define points for material
-                Material *material = new Material();
-                material->pos = WallPoints[0];
-                // add material point to room
-                room.Structures.push_back(material);
+                // add material point to land
+                self->addConstruct(std::make_shared<Material>(WallPoints[0]));
                 WallPoints.erase(WallPoints.begin());
-                self->addConstruct(material);            
-                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tPlaced wall!\n");
+                if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tPlaced wall!\n");       
                 return true;
             } else {
                 // being is not at point - moveto it
@@ -348,5 +371,8 @@ bool Build_C::placeBlock(Being *self) {
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tFINISHING ROOM\n");
     needtobuild = false;
     room.Finish(needGarden);
+    for(std::pair<int,int> pos : room.floorPoints) {
+        if ((*self->currPTArray)[pos.first][pos.second]->type == PT_TABLE) self->goToPT = pos;
+    }
     return false; 
 }

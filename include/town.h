@@ -1,8 +1,9 @@
 #ifndef TOWN_H
 #define TOWN_H
 
-#include "being.h"
 #include <vector>
+#include <string>
+#include "being.h"
 
 class Town {
     public:

@@ -1,10 +1,11 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include <vector>
+#include <string>
 #include "map.h"
 #include "config.h"
 #include "enums.h"
-#include <vector>
 #include "ConsoleLogger.h"
 
 class World {

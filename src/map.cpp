@@ -35,7 +35,7 @@ void MapSlice::cleanPTArray() {
     // clear the array of all non passable objects
     for (int i=0; i<MAP_ROWS; i++) {
         for (int j=0; j<MAP_COLS; j++) {
-            PointStructs_Array[i][j] = new PointStruct();
+            PointStructs_Array[i][j] = nullptr;
         }
     }
 }
@@ -47,7 +47,7 @@ land_pieces(MAP_ROWS, std::vector<Land>(MAP_COLS)), blocking_array(MAP_ROWS, std
 
 MapSlice::MapSlice(CConsoleLoggerEx *_debugconsole) : land_array(MAP_ROWS, std::vector<int>(MAP_COLS)), 
 land_pieces(MAP_ROWS, std::vector<Land>(MAP_COLS)), blocking_array(MAP_ROWS, std::vector<int>(MAP_COLS)), construct_array(MAP_ROWS, std::vector<int>(MAP_COLS)),
-PointStructs_Array(MAP_ROWS, std::vector<PointStruct*>(MAP_COLS)) {
+PointStructs_Array(MAP_ROWS, std::vector<std::shared_ptr<PointStruct>>(MAP_COLS)) {
     DEBUG_CONSOLE = _debugconsole;
 }
 
@@ -77,7 +77,7 @@ void MapSlice::generateCreatures() {
         for(int i=0; i<HUMAN_GEN_AMOUNT; i++) {
             pos = {rand() % MAP_ROWS, rand() % MAP_COLS};
             // job = jobtypes[rand() % jobtypes.size()];
-            job = FARMER;
+            job = NOJOB;
             Human *human = new Human(pos, job, &BuildingList, &land_pieces, DEBUG_CONSOLE, &blocking_array, &construct_array, &PointStructs_Array);
             human->myTown = &TownList[0];
             TownList[0].CreatureList.push_back(human);
@@ -142,6 +142,8 @@ void MapSlice::Update() {
             TownList[t].CreatureList[i]->Update();
         }
     }
+    cleanBlockingArray();
+    updateBlockingArray();
 }
 
 

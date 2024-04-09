@@ -22,11 +22,17 @@ int main() {
     // MAIN LOOP
     while(true) {
         cmd = _getch();
-        if (cmd == 'q') break; 
+        if (cmd == 'q') {
+            // game.EndGame();
+            break; 
+        }
         else if (cmd == 'a') game.gDisplay.view.second--;
         else if (cmd == 'w') game.gDisplay.view.first--;
         else if (cmd == 's') game.gDisplay.view.first++;
         else if (cmd == 'd') game.gDisplay.view.second++;
+        else if (cmd == 'p') game.printPointStructArray();
+        else if (cmd == 'g') game.moveBeings();
+        else if (cmd == 'b') game.printBlockingArray();
         else {
             game.UpdateWorld();
         }

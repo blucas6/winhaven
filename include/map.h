@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <string>
-
 #include "construct.h"
 #include "ConsoleLogger.h"
 #include "config.h"
@@ -25,7 +24,7 @@ class MapSlice {
 
         std::vector<Being*> CreatureList;               // all creatures on landslice
         std::vector<Construct*> BuildingList;           // all buildings on landslice
-        std::vector<std::vector<PointStruct*>> PointStructs_Array; // array of all pointstructs - needs to be regenerated whenever a room is changed
+        std::vector<std::vector<std::shared_ptr<PointStruct>>> PointStructs_Array; // array of all pointstructs - needs to be regenerated whenever a room is changed
         std::vector<Town> TownList;                     // array of all towns
 
         void mapGen();

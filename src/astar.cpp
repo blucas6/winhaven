@@ -11,7 +11,7 @@ bool Astar::isValid(std::pair<int,int> point) {
 bool Astar::isUnBlocked(std::vector<std::vector<int>> grid , std::pair<int,int> point) {
     // Returns true if the cell is not blocked else false
     // block_level: highest level of terrain difficulty that is considered "blocking"
-    return isValid(point) && (grid[point.first][point.second] < block_level);
+    return isValid(point) && (grid[point.first][point.second] < block_level || grid[point.first][point.second] == DOOR_PT_LEVEL);
 }
 
 bool Astar::isDestination(std::pair<int,int> position, std::pair<int,int> dest) {
@@ -144,6 +144,8 @@ bool Astar::astar(std::vector<std::vector<int>> grid, std::pair<int,int> src, st
                         if (isDestination(neighbour, dest)) { // Set the Parent of the destination cell
                             cellDetails[neighbour.first * C + neighbour.second].parent = { i, j };
                             tracePath(cellDetails, dest, C, Path);
+                            delete[] cellDetails;
+                            delete[] closedList;
                             return true;
                         }
                         // If the successor is already on the

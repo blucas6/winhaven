@@ -191,6 +191,8 @@ void astar(int grid[], std::pair<int,int> src, std::pair<int,int> dest, int C, i
                             }
                             // printf("The destination cell is found\n");
                             tracePath(cellDetails, dest, C, Path);
+                            delete[] cellDetails;
+                            delete[] closedList;
                             return;
                         }
                         // If the successor is already on the
@@ -295,15 +297,15 @@ int main() {
     std::vector<std::pair<int,int>> walls;
     std::vector<std::pair<int,int>> Path;
     
-    walls.push_back(std::pair(5,2));
-    walls.push_back(std::pair(5,3));
-    walls.push_back(std::pair(5,4));
-    walls.push_back(std::pair(5,5));
-    walls.push_back(std::pair(5,6));
-    walls.push_back(std::pair(5,8));
-    walls.push_back(std::pair(5,0));
-    walls.push_back(std::pair(5,7));
-    walls.push_back(std::pair(8,9));
+    walls.push_back(std::make_pair(5,2));
+    walls.push_back(std::make_pair(5,3));
+    walls.push_back(std::make_pair(5,4));
+    walls.push_back(std::make_pair(5,5));
+    walls.push_back(std::make_pair(5,6));
+    walls.push_back(std::make_pair(5,8));
+    walls.push_back(std::make_pair(5,0));
+    walls.push_back(std::make_pair(5,7));
+    walls.push_back(std::make_pair(8,9));
 
 
 

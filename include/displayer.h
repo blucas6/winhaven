@@ -1,19 +1,20 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "config.h"
+#include <iostream>
 #include <Windows.h>
 #include <vector>
+#include <string>
+#include "config.h"
 #include "map.h"
 #include "being.h"
 #include "construct.h"
 #include "graphics.h"
-#include <iostream>
 
 class Display {
     public:
         Display();
-        void Print(std::vector<std::vector<Land>> land_pieces, const std::vector<Being*> CreatureList, const std::vector<Construct*> BuildingList);
+        void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vector<Being*> CreatureList, const std::vector<std::vector<std::shared_ptr<PointStruct>>> PointStruct_Array);
         HANDLE wHnd; /* write (output) handle */
         HANDLE rHnd; /* read (input) handle */
         SMALL_RECT windowSize;

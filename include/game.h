@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <string>
 #include "world.h"
 #include "being.h"
 #include "displayer.h"
@@ -15,6 +16,10 @@ class Game {
         Display gDisplay;
         void PrintScreen();
         void UpdateWorld();
+        void EndGame();         // deallocate memory, save/clean up
+        void printPointStructArray();
+        void printBlockingArray();
+        void moveBeings();
 };
 
 #endif

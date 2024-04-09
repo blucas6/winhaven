@@ -1,19 +1,23 @@
 #ifndef CONSTRUCT_H
 #define CONSTRUCT_H
 
+#include <string>
 #include "graphics.h"
 #include "ConsoleLogger.h"
 #include "enums.h"
-#include <string>
+#include "config.h"
+#include <memory>
 
 class PointStruct {
     public:
         PointStruct();
         PointStruct(CConsoleLoggerEx *_debugconsole);
+        PointStruct(std::string name, char glyph, int color, int blockingLevel, PT_Type type, std::pair<int,int> pos);
         virtual ~PointStruct() {};
         CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
         std::pair<int,int> pos;
         std::string name;
+        PT_Type type;
         char glyph;
         int color;
         int blockingLevel;
@@ -25,47 +29,46 @@ class PointStruct {
 
 class Material : public PointStruct {
     public:
-        Material();
+        Material(std::pair<int,int> pos);
 };
 
 class CornerTL : public PointStruct {
     public:
-        CornerTL();
+        CornerTL(std::pair<int,int> pos);
 };
 
 class CornerTR : public PointStruct {
     public:
-        CornerTR();
+        CornerTR(std::pair<int,int> pos);
 };
 
 class CornerBL : public PointStruct {
     public:
-        CornerBL();
+        CornerBL(std::pair<int,int> pos);
 };
 
 class CornerBR : public PointStruct {
     public:
-        CornerBR();
+        CornerBR(std::pair<int,int> pos);
 };
 
 class Wall_H : public PointStruct {
     public:
-        Wall_H();
+        Wall_H(std::pair<int,int> pos);
 };
 
 class Wall_V : public PointStruct {
     public:
-        Wall_V();
+        Wall_V(std::pair<int,int> pos);
 };
 
 class Floor : public PointStruct {
     public:
-        Floor();
+        Floor(std::pair<int,int> pos);
 };
 
 class Door_H : public PointStruct {
     public:
-        Door_H();
         Door_H(std::pair<int,int> pos);
         char open_glyph;
         char close_glyph;
@@ -75,7 +78,6 @@ class Door_H : public PointStruct {
 
 class Door_V : public PointStruct {
     public:
-        Door_V();
         Door_V(std::pair<int,int> pos);
         char open_glyph;
         char close_glyph;
@@ -85,12 +87,12 @@ class Door_V : public PointStruct {
 
 class Table : public PointStruct {
     public:
-        Table();
+        Table(std::pair<int,int> pos);
 };
 
 class Chair : public PointStruct {
     public:
-        Chair();
+        Chair(std::pair<int,int> pos);
 };
 
 class Construct {
@@ -98,11 +100,13 @@ class Construct {
         Construct(std::string _type, CConsoleLoggerEx *_debugconsole);
         std::string type;
         CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
-        std::vector<PointStruct*> Structures;          // actual structures of the build
+        std::vector<std::vector<std::shared_ptr<PointStruct>>> *currPointStruct_Array = nullptr;    // pointer to actual pointstruct array
+        std::vector<std::vector<int>> *currConstructArray = nullptr;    // pointer to the construct array
         std::vector<std::pair<int,int>> wallPoints;     // pts that show where the structure is planned to be - needed for checking validity
         std::vector<std::pair<int,int>> floorPoints;    // inside area of build 
         std::vector<std::pair<int,int>> gardenPoints;   // if build has a garden
-
+        
+        void addConstruct(std::shared_ptr<PointStruct> pt, std::pair<int,int> pos);
         void Update();
 };
 
@@ -112,13 +116,11 @@ class Room : public Construct {
         int width;
         int height;
 
-        std::vector<std::vector<int>> *currConstructArray = nullptr;   // pointer to the mapslices construction array - used to mark door pt as special for astar
-
-        void Finish(bool isFence=false);
+        bool Finish(bool isFence=false);
         void MakeWalls();
-        std::vector<PointStruct*> AddFlooring();
-        std::vector<PointStruct*> AddFurniture(Furniture type, std::vector<PointStruct*> flooring, int pt);
-        int ValidFloorPt(std::vector<PointStruct*> flooring, std::pair<int,int> pt);
+        std::vector<std::shared_ptr<PointStruct>> AddFlooring();
+        std::vector<std::shared_ptr<PointStruct>> AddFurniture(Furniture type, std::vector<PointStruct*> flooring, int pt);
+        int ValidFloorPt(std::vector<std::shared_ptr<PointStruct>> flooring, std::pair<int,int> pt);
 };
 
 

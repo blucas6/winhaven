@@ -22,5 +22,54 @@ void Game::PrintScreen() {
     for(int t=0; t<world.gMap.TownList.size(); t++) {
         being_list.insert(being_list.end(), world.gMap.TownList[t].CreatureList.begin(), world.gMap.TownList[t].CreatureList.end());
     }
-    gDisplay.Print(world.gMap.land_pieces, being_list, world.gMap.BuildingList);
+    gDisplay.Print(world.gMap.land_pieces, being_list, world.gMap.PointStructs_Array);
+
+    being_list.clear();
+}
+
+void Game::moveBeings() {
+    for (Being *b : world.gMap.TownList[0].CreatureList) {
+        b->goToGOTOPT();
+    }
+}
+
+void Game::printPointStructArray() {
+    if (DEBUG_CONSOLE != nullptr) {
+        DEBUG_CONSOLE->cprintf("[game]\tPointStruct array:\n");
+        for (int i=0; i<MAP_ROWS; i++) {
+            for (int j=0; j<MAP_COLS; j++) {
+                if (world.gMap.PointStructs_Array[i][j] == nullptr) DEBUG_CONSOLE->cprintf(".");
+                else DEBUG_CONSOLE->cprintf("%x", world.gMap.PointStructs_Array[i][j]->type);
+            }
+        }
+    }
+}
+
+void Game::printBlockingArray() {
+    if (DEBUG_CONSOLE != nullptr) {
+        DEBUG_CONSOLE->cprintf("[game]\tBlocking array:\n");
+        for (int i=0; i<MAP_ROWS; i++) {
+            for (int j=0; j<MAP_COLS; j++) {
+                DEBUG_CONSOLE->cprintf("%d", world.gMap.blocking_array[i][j]);
+            }
+        }
+    }
+}
+
+void Game::EndGame() {
+    for (Being *b : world.gMap.CreatureList) {
+        b->clearComponents();
+        delete b;
+    }
+    // add creatures from towns to print out
+    for (int t=0; t<world.gMap.TownList.size(); t++) {
+       for (Being *b : world.gMap.TownList[t].CreatureList) {
+            b->clearComponents();
+            delete b;
+       }
+    }
+
+    for (Land *l : world.gMap.LandBinder) {
+        delete l;
+    }
 }

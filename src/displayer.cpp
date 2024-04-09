@@ -11,7 +11,7 @@ Display::Display() {
     SetConsoleScreenBufferSize(wHnd, bufferSize);
 }
 
-void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vector<Being*> CreatureList, const std::vector<Construct*> BuildingList) {
+void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vector<Being*> CreatureList, const std::vector<std::vector<std::shared_ptr<PointStruct>>> PointStruct_Array) {
     // Create screen buffer
     std::vector<std::vector<CHAR_INFO>> buffer(SCREEN_R, std::vector<CHAR_INFO>(SCREEN_C));
     try {
@@ -29,14 +29,15 @@ void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vecto
         }
         // Add building layer
         std::pair<int,int> realpos;
-        for (const Construct* el: BuildingList) {
-            // cycle through all pts in construct
-            for (int i=0; i<el->Structures.size(); i++) {
-                realpos.first = el->Structures[i]->pos.first - view.first;
-                realpos.second = el->Structures[i]->pos.second - view.second;
-                if (realpos.first>=0 && realpos.first<SCREEN_R && realpos.second>=0 && realpos.second<SCREEN_C) {
-                    buffer[realpos.first][realpos.second].Char.AsciiChar = el->Structures[i]->glyph;
-                    buffer[realpos.first][realpos.second].Attributes = el->Structures[i]->color;
+        for (int i=0; i<MAP_ROWS; i++) {
+            for (int j=0; j<MAP_COLS; j++) {
+                if (PointStruct_Array[i][j] != nullptr) {
+                    realpos.first = PointStruct_Array[i][j]->pos.first - view.first;
+                    realpos.second = PointStruct_Array[i][j]->pos.second - view.second;
+                    if (realpos.first>=0 && realpos.first<SCREEN_R && realpos.second>=0 && realpos.second<SCREEN_C) {
+                        buffer[realpos.first][realpos.second].Char.AsciiChar = PointStruct_Array[i][j]->glyph;
+                        buffer[realpos.first][realpos.second].Attributes = PointStruct_Array[i][j]->color;
+                    }
                 }
             }
         }

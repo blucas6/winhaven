@@ -10,8 +10,13 @@
 
 # constructs
     pointstruct is the lowest form of construct (responsible for color, glyph, pos)
-    basic unit is a construct, which the pointstruct it holds can be updated dynamically
+    basic unit is a construct
     room is a special construct that cleans up the look when finished
+    
+    # arrays
+        construct_array - used to keep track of the structures that are blocking
+        PT_array        - actual array of pointstructs 
+        NOTE: must load both when adding a structure
 
 # builds 
     0----0  w:6 h:4 

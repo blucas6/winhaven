@@ -1,6 +1,6 @@
 # Compiler and compiler flags
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra -pedantic -fpermissive
+CXXFLAGS := -std=c++14 -Wall -Wextra -pedantic -fpermissive
 LDFLAGS :=
 
 # Directories

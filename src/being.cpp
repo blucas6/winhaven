@@ -1,10 +1,9 @@
 #include "being.h"
 #include "components.h"
-#include <memory>
 
 short BEING_ID = 1;
 
-Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<PointStruct*>> *pointstruct_array) {
+Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<std::shared_ptr<PointStruct>>> *pointstruct_array) {
     ID = BEING_ID++;
     type = t;
     glyph = gly;
@@ -20,6 +19,10 @@ Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLo
     currBlockingArray = blocking_array;
     currConstructArray = construct_array; 
     currPTArray = pointstruct_array;
+}
+
+void Being::goToGOTOPT() {
+    thought = GOTO;
 }
 
 void Being::NewThought() {
@@ -40,6 +43,8 @@ void Being::Update() {
             laziness.second = laziness.first;
             NewThought();
         } else laziness.second--;
+    } else if (thought == GOTO) {
+        moveto = goToPT;
     }
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[being]\tUpdating being ID(%d) [T:%d | S:%d | P:%d,%d]\n", ID, thought, state, pos.first, pos.second);
     // Update all the components for this being
@@ -48,17 +53,26 @@ void Being::Update() {
     }
 }
 
-void Being::addConstruct(PointStruct *pt) {
-    (*currConstructArray)[pt->pos.first][pt->pos.second] = pt->blockingLevel;
-    (*currPTArray)[pt->pos.first][pt->pos.second] = pt;
+void Being::addConstruct(std::shared_ptr<PointStruct> pt) {
+    if (pt->pos.first > -1 && pt->pos.second > -1) {
+        (*currConstructArray)[pt->pos.first][pt->pos.second] = pt->blockingLevel;
+        (*currPTArray)[pt->pos.first][pt->pos.second] = pt;
+        if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[being]\tAdding Structure (%d)\n", (*currPTArray)[pt->pos.first][pt->pos.second]->type);
+    } else if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[being]\t**Error** Adding PT with no position!\n");
 }
 
 void Being::removeConstruct(std::pair<int,int> pt) {
     (*currConstructArray)[pt.first][pt.second] = 0;
-    (*currPTArray)[pt.first][pt.second] = new PointStruct();
+    (*currPTArray)[pt.first][pt.second] = nullptr;
 }
 
-Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<PointStruct*>> *pointstruct_array) 
+void Being::clearComponents() {
+    for (Component *co : ComponentList) {
+        delete co;
+    }
+}
+
+Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<std::shared_ptr<PointStruct>>> *pointstruct_array) 
 : Being("Human", '@', FG_WHITE, _pos, _debugconsole, blocking_array, construct_array, pointstruct_array) {
     // give a human a job component
     ComponentList.push_back(new Job_C(_job, _debugconsole));

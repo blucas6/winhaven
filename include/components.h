@@ -4,10 +4,10 @@
 #include <string>
 #include <math.h>
 #include <vector>
+#include <memory>
 #include "enums.h"
 #include "config.h"
 #include "ConsoleLogger.h"
-#include "enums.h"
 #include "being.h"
 #include "construct.h"
 #include "astar.h"
@@ -17,6 +17,7 @@
 class Component {
     public:
         Component(ComponentID _ID, CConsoleLoggerEx *_debugconsole);
+        virtual ~Component() {};
         ComponentID ID;
         CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
 
@@ -35,6 +36,8 @@ class Movement_C : public Component {
         void Update(Being *self);
         void Wander(Being *self);
         void Move(Being *self);
+        DoorAction CheckForDoor(Being *self, std::pair<int,int> pt);
+        void PathFailure(Being *self);
 };
 
 // Handle job actions ///////////////////
@@ -51,7 +54,7 @@ class Build_C : public Component {
     public:
         Build_C(std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole);
         std::vector<Construct*> *mapBuildListPtr = nullptr;         // pointer to construction list
-        std::vector<std::vector<Land>> *landPiecesPtr = nullptr;
+        std::vector<std::vector<Land>> *landPiecesPtr = nullptr;    // pointer to land pieces
         std::string name;
         std::pair<int,int> BuildLocation;
         std::pair<int,int> BuildSize;

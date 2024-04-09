@@ -23,6 +23,7 @@ class Land {
     public:
         Land(); // need default for map array
         Land(LandTile ground, LandTile plant, LandTile tilled);
+        virtual ~Land() {};
         LandTile current;
         LandTile ground;
         LandTile plant;
