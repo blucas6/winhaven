@@ -11,7 +11,7 @@ Display::Display() {
     SetConsoleScreenBufferSize(wHnd, bufferSize);
 }
 
-void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vector<Being*> CreatureList, const std::vector<std::vector<std::shared_ptr<PointStruct>>> PointStruct_Array) {
+void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vector<std::shared_ptr<Being>> CreatureList, const std::vector<std::vector<std::shared_ptr<PointStruct>>> PointStruct_Array) {
     // Create screen buffer
     std::vector<std::vector<CHAR_INFO>> buffer(SCREEN_R, std::vector<CHAR_INFO>(SCREEN_C));
     try {
@@ -42,7 +42,7 @@ void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vecto
             }
         }
         // Add creature layer
-        for (const Being* el : CreatureList) {
+        for (const std::shared_ptr<Being> el : CreatureList) {
             realpos.first = el->pos.first - view.first;
             realpos.second = el->pos.second - view.second;
             if (realpos.first>=0 && realpos.first<SCREEN_R && realpos.second>=0 && realpos.second<SCREEN_C) {

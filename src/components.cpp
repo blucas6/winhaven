@@ -119,7 +119,7 @@ void Job_C::Update(Being *self) {
 
 ////////////////////////////
 
-Build_C::Build_C(std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole) : Component(BUILD_C, _debugconsole), room("room", _debugconsole) {
+Build_C::Build_C(std::vector<std::shared_ptr<Construct>> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole) : Component(BUILD_C, _debugconsole), room("room", _debugconsole) {
     mapBuildListPtr = buildingListp;
     landPiecesPtr = _landPiecesPtr;
 }
@@ -144,7 +144,7 @@ bool Build_C::isBuildValid() {
     trypts.insert(trypts.end(), FloorPoints.begin(), FloorPoints.end());
     trypts.insert(trypts.end(), GardenPoints.begin(), GardenPoints.end());
     // go through all builds
-    for (const Construct* el: *mapBuildListPtr) {
+    for (const std::shared_ptr<Construct> el: *mapBuildListPtr) {
         // concatenate all wall pts floor pts and garden pts
         std::vector<std::pair<int,int>> currentStructs;
         currentStructs.insert(currentStructs.end(), el->wallPoints.begin(), el->wallPoints.end());
@@ -218,7 +218,7 @@ bool Build_C::init(Being *self, Jobs job) {
     room.gardenPoints = GardenPoints;
     room.currPointStruct_Array = self->currPTArray;
     room.currConstructArray = self->currConstructArray;
-    mapBuildListPtr->push_back(&room);
+    mapBuildListPtr->push_back(std::make_shared<Room>(room));
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\t=Build picked at (%d,%d)=\n\n", BuildLocation.first, BuildLocation.second);
     return true;
 }

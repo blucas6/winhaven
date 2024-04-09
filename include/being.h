@@ -28,7 +28,7 @@ class Being {
         Thoughts thought = NO_THOT;
         std::vector<Thoughts> thought_list;                 // all possible thoughts
         bool newthought = false;                            // dictates whether or not to pick a new thought
-        std::vector<Component*> ComponentList;
+        std::vector<std::shared_ptr<Component>> ComponentList;
         CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
         std::vector<std::vector<int>> *currBlockingArray = nullptr;     // pointer to the current turns blocking_array for astar
         std::vector<std::vector<int>> *currConstructArray = nullptr;    // pointer to the mapslices construction array - used to update build pts
@@ -51,7 +51,7 @@ class Being {
 
 class Human : public Being {
     public:
-        Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<std::shared_ptr<PointStruct>>> *pointstruct_array);
+        Human(std::pair<int,int> _pos, Jobs _job, std::vector<std::shared_ptr<Construct>> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<std::shared_ptr<PointStruct>>> *pointstruct_array);
 };
 
 #endif

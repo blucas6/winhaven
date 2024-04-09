@@ -48,7 +48,7 @@ void Being::Update() {
     }
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[being]\tUpdating being ID(%d) [T:%d | S:%d | P:%d,%d]\n", ID, thought, state, pos.first, pos.second);
     // Update all the components for this being
-    for (Component *comp : ComponentList) {
+    for (std::shared_ptr<Component> comp : ComponentList) {
         comp->Update(this);
     }
 }
@@ -67,18 +67,16 @@ void Being::removeConstruct(std::pair<int,int> pt) {
 }
 
 void Being::clearComponents() {
-    for (Component *co : ComponentList) {
-        delete co;
-    }
+    ComponentList.clear();
 }
 
-Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<std::shared_ptr<PointStruct>>> *pointstruct_array) 
+Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<std::shared_ptr<Construct>> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<std::shared_ptr<PointStruct>>> *pointstruct_array) 
 : Being("Human", '@', FG_WHITE, _pos, _debugconsole, blocking_array, construct_array, pointstruct_array) {
     // give a human a job component
-    ComponentList.push_back(new Job_C(_job, _debugconsole));
-    ComponentList.push_back(new Build_C(buildingListp, _landPiecesPtr, _debugconsole));
-    if ( ((Build_C*)ComponentList.back())->init(this,_job) ) {
+    ComponentList.push_back(std::make_shared<Job_C>(_job, _debugconsole));
+    ComponentList.push_back(std::make_shared<Build_C>(buildingListp, _landPiecesPtr, _debugconsole));
+    if ( std::dynamic_pointer_cast<Build_C>(ComponentList.back())->init(this,_job) ) {
         thought_list.push_back(BUILD);
     }
-    ComponentList.push_back(new Movement_C(&pos, _debugconsole, blockingLevel));
+    ComponentList.push_back(std::make_shared<Movement_C>(&pos, _debugconsole, blockingLevel));
 }

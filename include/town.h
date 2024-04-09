@@ -9,7 +9,7 @@ class Town {
     public:
         Town();
         int ID;
-        std::vector<Being*> CreatureList;               // all creatures in town
+        std::vector<std::shared_ptr<Being>> CreatureList;               // all creatures in town
 
 };
 

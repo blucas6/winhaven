@@ -52,8 +52,8 @@ class Job_C : public Component {
 // Handle build actions ////////////////
 class Build_C : public Component {
     public:
-        Build_C(std::vector<Construct*> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole);
-        std::vector<Construct*> *mapBuildListPtr = nullptr;         // pointer to construction list
+        Build_C(std::vector<std::shared_ptr<Construct>> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole);
+        std::vector<std::shared_ptr<Construct>> *mapBuildListPtr = nullptr;         // pointer to construction list
         std::vector<std::vector<Land>> *landPiecesPtr = nullptr;    // pointer to land pieces
         std::string name;
         std::pair<int,int> BuildLocation;

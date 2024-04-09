@@ -56,8 +56,8 @@ void MapSlice::generateTowns() {
 }
 
 void MapSlice::mapGen() {
-    LandBinder.push_back(new Land(Dirt(), Grass(), Tilled()));       // add all land pieces
-    LandBinder.push_back(new Land(Rock(), Moss(), Tilled()));
+    LandBinder.push_back(std::make_shared<Land>(Dirt(), Grass(), Tilled()));       // add all land pieces
+    LandBinder.push_back(std::make_shared<Land>(Rock(), Moss(), Tilled()));
     generateLand();
     getMapGlyphs();
     cleanBlockingArray();
@@ -78,7 +78,7 @@ void MapSlice::generateCreatures() {
             pos = {rand() % MAP_ROWS, rand() % MAP_COLS};
             // job = jobtypes[rand() % jobtypes.size()];
             job = NOJOB;
-            Human *human = new Human(pos, job, &BuildingList, &land_pieces, DEBUG_CONSOLE, &blocking_array, &construct_array, &PointStructs_Array);
+            std::shared_ptr<Human> human = std::make_shared<Human>(pos, job, &BuildingList, &land_pieces, DEBUG_CONSOLE, &blocking_array, &construct_array, &PointStructs_Array);
             human->myTown = &TownList[0];
             TownList[0].CreatureList.push_back(human);
         }

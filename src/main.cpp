@@ -23,7 +23,7 @@ int main() {
     while(true) {
         cmd = _getch();
         if (cmd == 'q') {
-            // game.EndGame();
+            game.EndGame();
             break; 
         }
         else if (cmd == 'a') game.gDisplay.view.second--;

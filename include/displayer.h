@@ -14,7 +14,7 @@
 class Display {
     public:
         Display();
-        void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vector<Being*> CreatureList, const std::vector<std::vector<std::shared_ptr<PointStruct>>> PointStruct_Array);
+        void Display::Print(std::vector<std::vector<Land>> land_pieces, const std::vector<std::shared_ptr<Being>> CreatureList, const std::vector<std::vector<std::shared_ptr<PointStruct>>> PointStruct_Array);
         HANDLE wHnd; /* write (output) handle */
         HANDLE rHnd; /* read (input) handle */
         SMALL_RECT windowSize;

@@ -20,10 +20,10 @@ class MapSlice {
         std::vector<std::vector<Land>> land_pieces;     // actual char glyphs for displaying
         std::vector<std::vector<int>> blocking_array;   // for pathfinding
         std::vector<std::vector<int>> construct_array;  // save unmoveable objects in here as ints for faster pathfinding
-        std::vector<Land*> LandBinder;                  // binder of all possible land pieces
+        std::vector<std::shared_ptr<Land>> LandBinder;                  // binder of all possible land pieces
 
-        std::vector<Being*> CreatureList;               // all creatures on landslice
-        std::vector<Construct*> BuildingList;           // all buildings on landslice
+        std::vector<std::shared_ptr<Being>> CreatureList;               // all creatures on landslice
+        std::vector<std::shared_ptr<Construct>> BuildingList;           // all buildings on landslice
         std::vector<std::vector<std::shared_ptr<PointStruct>>> PointStructs_Array; // array of all pointstructs - needs to be regenerated whenever a room is changed
         std::vector<Town> TownList;                     // array of all towns
 

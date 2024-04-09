@@ -119,7 +119,7 @@ class Room : public Construct {
         bool Finish(bool isFence=false);
         void MakeWalls();
         std::vector<std::shared_ptr<PointStruct>> AddFlooring();
-        std::vector<std::shared_ptr<PointStruct>> AddFurniture(Furniture type, std::vector<PointStruct*> flooring, int pt);
+        std::vector<std::shared_ptr<PointStruct>> AddFurniture(Furniture type, std::vector<std::shared_ptr<PointStruct>> flooring, int pt);
         int ValidFloorPt(std::vector<std::shared_ptr<PointStruct>> flooring, std::pair<int,int> pt);
 };
 

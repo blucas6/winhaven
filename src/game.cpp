@@ -16,7 +16,7 @@ void Game::UpdateWorld() {
 }
 
 void Game::PrintScreen() {
-    std::vector<Being*> being_list;
+    std::vector<std::shared_ptr<Being>> being_list;
     being_list.insert(being_list.end(), world.gMap.CreatureList.begin(), world.gMap.CreatureList.end());
     // add creatures from towns to print out
     for(int t=0; t<world.gMap.TownList.size(); t++) {
@@ -28,7 +28,7 @@ void Game::PrintScreen() {
 }
 
 void Game::moveBeings() {
-    for (Being *b : world.gMap.TownList[0].CreatureList) {
+    for (std::shared_ptr<Being> b : world.gMap.TownList[0].CreatureList) {
         b->goToGOTOPT();
     }
 }
@@ -57,19 +57,5 @@ void Game::printBlockingArray() {
 }
 
 void Game::EndGame() {
-    for (Being *b : world.gMap.CreatureList) {
-        b->clearComponents();
-        delete b;
-    }
-    // add creatures from towns to print out
-    for (int t=0; t<world.gMap.TownList.size(); t++) {
-       for (Being *b : world.gMap.TownList[t].CreatureList) {
-            b->clearComponents();
-            delete b;
-       }
-    }
-
-    for (Land *l : world.gMap.LandBinder) {
-        delete l;
-    }
+    
 }
