@@ -8,17 +8,17 @@
     v2 = rand() % 100 + 1;     // v2 in the range 1 to 100
     v3 = rand() % 30 + 1985;   // v3 in the range 1985-2014
 
-# constructs
-    pointstruct is the lowest form of construct (responsible for color, glyph, pos)
-    basic unit is a construct
-    room is a special construct that cleans up the look when finished
+# Constructs
+    Pointstruct is the lowest form of construct (responsible for color, glyph, pos)
+    basic unit is a Construct
+    Room is a special construct that cleans up the look when finished
     
-    # arrays
-        construct_array - used to keep track of the structures that are blocking
-        PT_array        - actual array of pointstructs 
-        NOTE: must load both when adding a structure
+# Arrays
+    construct_array - used to keep track of the structures that are blocking (stored in here since they wont move)
+    PT_array        - actual array of pointstructs 
+    NOTE: must load both when adding a structure
 
-# builds 
+# Builds 
     0----0  w:6 h:4 
     |    |  it will be built by going
     |    |  (0 to 5) 0----0, (1 to 2) | |
@@ -39,6 +39,10 @@
     contains all the info for creatures, buildings, etc in that slice
     is responsible for updating creatures
     is responsible for pathfinding arrays
+
+# Thought
+    Thoughts dictate what the being will do
+    most component will have a specific thought as a condition for being updated
 
 # Components
     some components will add a possible thought to the being

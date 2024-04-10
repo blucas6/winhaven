@@ -41,10 +41,9 @@ class Movement_C : public Component {
 };
 
 // Handle job actions ///////////////////
-class Job_C : public Component {
+class Job_C_Farmer : public Component {
     public:
-        Job_C(Jobs _job, CConsoleLoggerEx *_debugconsole);
-        Jobs job;               // job type
+        Job_C_Farmer(CConsoleLoggerEx *_debugconsole);
 
         void Update(Being *self);
 };

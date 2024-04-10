@@ -6,8 +6,11 @@ void MapSlice::generateLand() {
     int type;
     for (int i=0; i<MAP_ROWS; i++) {
         for (int j=0; j<MAP_COLS; j++) {
-            type = 1 + rand() % 10;
-            if (type < 3) land_array[i][j] = 1;
+            type = 1 + rand() % 200;
+            if (type < 10) land_array[i][j] = 1;
+            else if (type < 12) land_array[i][j] = 2;
+            else if (type < 14) land_array[i][j] = 3;
+            else if (type < 15) land_array[i][j] = 4;
             else land_array[i][j] = 0; 
         }
     }
@@ -56,8 +59,13 @@ void MapSlice::generateTowns() {
 }
 
 void MapSlice::mapGen() {
-    LandBinder.push_back(std::make_shared<Land>(Dirt(), Grass(), Tilled()));       // add all land pieces
-    LandBinder.push_back(std::make_shared<Land>(Rock(), Moss(), Tilled()));
+    // add all land pieces
+    LandBinder.push_back(std::make_shared<Land>(Dirt(), Grass(), Tilled()));       // Dirt block - grows grass
+    LandBinder.push_back(std::make_shared<Land>(Rock(), Moss(), Tilled()));         // Rock block - grows moss
+    LandBinder.push_back(std::make_shared<Land>(Dirt(), Hay(), Tilled()));
+    LandBinder.push_back(std::make_shared<Land>(Dirt(), Barley(), Tilled()));
+    LandBinder.push_back(std::make_shared<Land>(Dirt(), Blueberry(), Tilled()));
+
     generateLand();
     getMapGlyphs();
     cleanBlockingArray();

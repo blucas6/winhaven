@@ -109,12 +109,16 @@ void Movement_C::PathFailure(Being *self) {
 ////////////////////////////
 
 // JOB COMPONENT ///////////
-Job_C::Job_C(Jobs _job, CConsoleLoggerEx *_debugconsole) : Component(JOB_C, _debugconsole) {
-    job = _job;
+Job_C_Farmer::Job_C_Farmer(CConsoleLoggerEx *_debugconsole) : Component(JOB_C, _debugconsole) {
+
 }
 
-void Job_C::Update(Being *self) {
-
+void Job_C_Farmer::Update(Being *self) {
+    // job thought and build must be done
+    if (self->thought == JOB_THOT) {
+        // in order to farm the fields must be grown
+        self->thought = NO_THOT;
+    }
 }
 
 ////////////////////////////
@@ -225,14 +229,14 @@ bool Build_C::init(Being *self, Jobs job) {
 
 void Build_C::Update(Being *self) {
     // Check if we have built yet
-    if (needtobuild && self->thought == BUILD) {
+    if (needtobuild && self->thought == BUILD_THOT) {
         if (!placeBlock(self)) {
             // build is done
             self->thought = NO_THOT;
             // remove BUILD thought
             int ind = -1;
             for (int i=0; i<self->thought_list.size(); i++) {
-                if (self->thought_list[i] == BUILD) ind = i;
+                if (self->thought_list[i] == BUILD_THOT) ind = i;
             }
             if (ind != -1) self->thought_list.erase(self->thought_list.begin() + ind);
         }

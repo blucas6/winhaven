@@ -12,7 +12,7 @@ Being::Being(std::string t, char gly, int c, std::pair<int,int> _pos, CConsoleLo
     moveto.first = -1;  // so movement component wont move the being
     moveto.second = -1;
     thought_list.push_back(NO_THOT);
-    thought_list.push_back(RELAX);
+    thought_list.push_back(RELAX_THOT);
     DEBUG_CONSOLE = _debugconsole;
     laziness.first = 1 + rand() % 5;
     laziness.second = laziness.first;
@@ -37,7 +37,7 @@ void Being::Update() {
         NewThought();
         state = IDLE;
     }
-    else if (thought == RELAX) {
+    else if (thought == RELAX_THOT) {
         state = WANDER;
         if (laziness.second - 1 <= 0) {
             laziness.second = laziness.first;
@@ -73,10 +73,20 @@ void Being::clearComponents() {
 Human::Human(std::pair<int,int> _pos, Jobs _job, std::vector<std::shared_ptr<Construct>> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole, std::vector<std::vector<int>> *blocking_array, std::vector<std::vector<int>> *construct_array, std::vector<std::vector<std::shared_ptr<PointStruct>>> *pointstruct_array) 
 : Being("Human", '@', FG_WHITE, _pos, _debugconsole, blocking_array, construct_array, pointstruct_array) {
     // give a human a job component
-    ComponentList.push_back(std::make_shared<Job_C>(_job, _debugconsole));
+    switch(_job) {
+        case FARMER:
+            ComponentList.push_back(std::make_shared<Job_C_Farmer>(_debugconsole));
+            break;
+        case BREWER:
+            break;
+        case PRIEST:
+            break;
+        default:
+            break;
+    }
     ComponentList.push_back(std::make_shared<Build_C>(buildingListp, _landPiecesPtr, _debugconsole));
     if ( std::dynamic_pointer_cast<Build_C>(ComponentList.back())->init(this,_job) ) {
-        thought_list.push_back(BUILD);
+        thought_list.push_back(BUILD_THOT);
     }
     ComponentList.push_back(std::make_shared<Movement_C>(&pos, _debugconsole, blockingLevel));
 }

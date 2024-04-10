@@ -18,7 +18,7 @@ class LandTile {
         std::vector<char> glyphs;
         void init();
 };
-
+// Actual land block
 class Land {
     public:
         Land(); // need default for map array
@@ -56,6 +56,21 @@ class Moss : public LandTile {
 class Tilled : public LandTile {
     public:
         Tilled();
+};
+
+class Barley : public LandTile {
+    public:
+        Barley();
+};
+
+class Hay : public LandTile {
+    public:
+        Hay();
+};
+
+class Blueberry : public LandTile {
+    public:
+        Blueberry();
 };
 
 #endif

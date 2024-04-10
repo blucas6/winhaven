@@ -70,23 +70,20 @@ void Land::till() {
 }
 
 // TYPES ///////////////////////////////////
-Dirt::Dirt() : LandTile("Dirt", LAND_ID++, {FG_DARKYELLOW}, {'.'}) {
+Dirt::Dirt() : LandTile("Dirt", LAND_ID++, {FG_DARKYELLOW}, {'.'}) {}
 
-}
+Rock::Rock() : LandTile("Rock", LAND_ID++, {FG_DARKGREY, FG_LIGHTGREY}, {':', '.'}) {}
 
-Rock::Rock() : LandTile("Rock", LAND_ID++, {FG_DARKGREY, FG_LIGHTGREY}, {':', '.'}) {
+Grass::Grass() : LandTile("Grass", LAND_ID++, {FG_GREEN}, {'\'', '"', '`', ',', ';'}) {}
 
-}
+Moss::Moss() : LandTile("Moss", LAND_ID++, {FG_DARKCYAN}, {'*'}) {}
 
-Grass::Grass() : LandTile("Grass", LAND_ID++, {FG_GREEN}, {'\'', '"', '`', ',', ';'}) {
+Tilled::Tilled() : LandTile("Tilled land", LAND_ID++, {FG_DARKYELLOW}, {'~'}) {}
 
-}
+Barley::Barley() : LandTile("Barley", LAND_ID++, {FG_DARKYELLOW}, {';'}) {}
 
-Moss::Moss() : LandTile("Moss", LAND_ID++, {FG_DARKGREEN}, {'*'}) {
+Hay::Hay() : LandTile("Hay", LAND_ID++, {FG_YELLOW}, {'"'}) {}
 
-}
+Blueberry::Blueberry() : LandTile("Blueberry", LAND_ID++, {FG_DARKBLUE}, {'.'}) {}
 
-Tilled::Tilled() : LandTile("Tilled land", LAND_ID++, {FG_DARKYELLOW}, {'~'}) {
-
-}
 ////////////////////////////////////////////

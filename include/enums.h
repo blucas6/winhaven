@@ -3,8 +3,9 @@
 
 enum Thoughts {
     NO_THOT,
-    RELAX,
-    BUILD,
+    RELAX_THOT,
+    BUILD_THOT,
+    JOB_THOT,
     GOTO
 };
 
