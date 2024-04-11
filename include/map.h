@@ -23,7 +23,7 @@ class MapSlice {
         std::vector<std::shared_ptr<Land>> LandBinder;                  // binder of all possible land pieces
 
         std::vector<std::shared_ptr<Being>> CreatureList;               // all creatures on landslice
-        std::vector<std::shared_ptr<Construct>> BuildingList;           // all buildings on landslice
+        std::vector<std::shared_ptr<Construct>> BuildingList;           // all buildings on landslice - used to make sure builds wont overlap!
         std::vector<std::vector<std::shared_ptr<PointStruct>>> PointStructs_Array; // array of all pointstructs - needs to be regenerated whenever a room is changed
         std::vector<Town> TownList;                     // array of all towns
 

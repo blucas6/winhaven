@@ -19,6 +19,7 @@ class Game {
         void EndGame();         // deallocate memory, save/clean up
         void printPointStructArray();
         void printBlockingArray();
+        void printTownInfo();
         void moveBeings();
 };
 

@@ -77,7 +77,7 @@ void MapSlice::generateCreatures() {
         for(int i=0; i<HUMAN_GEN_AMOUNT; i++) {
             pos = {rand() % MAP_ROWS, rand() % MAP_COLS};
             // job = jobtypes[rand() % jobtypes.size()];
-            job = NOJOB;
+            job = FARMER;
             std::shared_ptr<Human> human = std::make_shared<Human>(pos, job, &BuildingList, &land_pieces, DEBUG_CONSOLE, &blocking_array, &construct_array, &PointStructs_Array);
             human->myTown = &TownList[0];
             TownList[0].CreatureList.push_back(human);

@@ -97,8 +97,9 @@ class Chair : public PointStruct {
 
 class Construct {
     public:
-        Construct(std::string _type, CConsoleLoggerEx *_debugconsole);
-        std::string type;
+        Construct(Construct_T _typeOfConstruct, CConsoleLoggerEx *_debugconsole);
+        virtual ~Construct() {};
+        Construct_T typeOfConstruct;
         CConsoleLoggerEx *DEBUG_CONSOLE = nullptr;
         std::vector<std::vector<std::shared_ptr<PointStruct>>> *currPointStruct_Array = nullptr;    // pointer to actual pointstruct array
         std::vector<std::vector<int>> *currConstructArray = nullptr;    // pointer to the construct array
@@ -112,9 +113,10 @@ class Construct {
 
 class Room : public Construct {
     public:
-        Room(std::string _name, CConsoleLoggerEx *_debugconsole);
+        Room(Construct_T _typeOfConstruct, CConsoleLoggerEx *_debugconsole);
         int width;
         int height;
+        Jobs typeOfHouse;
 
         bool Finish(bool isFence=false);
         void MakeWalls();

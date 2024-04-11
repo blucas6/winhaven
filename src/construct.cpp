@@ -88,8 +88,8 @@ Table::Table(std::pair<int,int> _pos) : PointStruct("table", (char)210, FG_YELLO
 
 Chair::Chair(std::pair<int,int> _pos) : PointStruct("chair", (char)170, FG_YELLOW, 0, PT_CHAIR, _pos) {}
 
-Construct::Construct(std::string _type, CConsoleLoggerEx *_debugconsole) {
-    type = _type;
+Construct::Construct(Construct_T _type, CConsoleLoggerEx *_debugconsole) {
+    typeOfConstruct = _type;
     DEBUG_CONSOLE = _debugconsole;
 }
 
@@ -102,7 +102,7 @@ void Construct::addConstruct(std::shared_ptr<PointStruct> pt, std::pair<int,int>
     (*currConstructArray)[pos.first][pos.second] = (*currPointStruct_Array)[pos.first][pos.second]->blockingLevel;
 }
 
-Room::Room(std::string _name, CConsoleLoggerEx *_debugconsole) : Construct(_name, _debugconsole) {
+Room::Room(Construct_T _typeOfConstruct, CConsoleLoggerEx *_debugconsole) : Construct(typeOfConstruct, _debugconsole) {
    
 }
 
@@ -139,7 +139,6 @@ void Room::MakeWalls() {
     else if (door_ind[ch] < width + height - 1) addConstruct(std::make_shared<Door_V>(dpos), dpos);
     else if (door_ind[ch] < width + height + width - 2) addConstruct(std::make_shared<Door_H>(dpos), dpos);
     else addConstruct(std::make_shared<Door_V>(dpos), dpos);
-    if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[room]\tDoor is of type %d\n", (*currPointStruct_Array)[dpos.first][dpos.second]->type);    
 }
 
 std::vector<std::shared_ptr<PointStruct>> Room::AddFlooring() {

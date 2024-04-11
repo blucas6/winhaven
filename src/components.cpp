@@ -119,7 +119,7 @@ void Job_C::Update(Being *self) {
 
 ////////////////////////////
 
-Build_C::Build_C(std::vector<std::shared_ptr<Construct>> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole) : Component(BUILD_C, _debugconsole), room("room", _debugconsole) {
+Build_C::Build_C(std::vector<std::shared_ptr<Construct>> *buildingListp, std::vector<std::vector<Land>> *_landPiecesPtr, CConsoleLoggerEx *_debugconsole) : Component(BUILD_C, _debugconsole), room(ROOM_CON, _debugconsole) {
     mapBuildListPtr = buildingListp;
     landPiecesPtr = _landPiecesPtr;
 }
@@ -163,21 +163,17 @@ bool Build_C::isBuildValid() {
 bool Build_C::init(Being *self, Jobs job) {
     switch (job) {
         case FARMER:
-            name = "Farm";
             maxBuildsz = FARM_SZ_MAX;
             needGarden = true;
             maxGardensz = FARM_GARDEN_SZ_MAX;
             break;
         case BREWER:
-            name = "Alehouse";
             maxBuildsz = ALEHOUSE_SZ_MAX;
             break;
         case PRIEST:
-            name = "Church";
             maxBuildsz = CHURCH_SZ_MAX;
             break;
         default:
-            name = "House";
             maxBuildsz = HOUSE_SZ_MAX;
             break;
     }
@@ -212,7 +208,7 @@ bool Build_C::init(Being *self, Jobs job) {
     needtobuild = true;
     room.width = BuildSize.first;
     room.height = BuildSize.second;
-    room.type = name;
+    room.typeOfHouse = job;
     room.wallPoints = WallPoints;
     room.floorPoints = FloorPoints;
     room.gardenPoints = GardenPoints;
@@ -373,6 +369,11 @@ bool Build_C::placeBlock(Being *self) {
     room.Finish(needGarden);
     for(std::pair<int,int> pos : room.floorPoints) {
         if ((*self->currPTArray)[pos.first][pos.second]->type == PT_TABLE) self->goToPT = pos;
+    }
+    // add build to town
+    self->myTown->BuildingList.push_back(std::make_shared<Room>(room));
+    for (int i=0; i<self->myTown->BuildingList.size(); i++) {
+        if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\t\ttype of construct:%d type of house:%d\n", self->myTown->BuildingList[i]->typeOfConstruct, std::dynamic_pointer_cast<Room>(self->myTown->BuildingList[i])->typeOfHouse);
     }
     return false; 
 }

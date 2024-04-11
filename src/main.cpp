@@ -33,6 +33,7 @@ int main() {
         else if (cmd == 'p') game.printPointStructArray();
         else if (cmd == 'g') game.moveBeings();
         else if (cmd == 'b') game.printBlockingArray();
+        else if (cmd == 't') game.printTownInfo();
         else {
             game.UpdateWorld();
         }

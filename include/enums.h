@@ -54,4 +54,9 @@ enum PT_Type {
     PT_UNKNOWN
 };
 
+enum Construct_T {
+    DEFAULT_CON,
+    ROOM_CON
+};
+
 #endif

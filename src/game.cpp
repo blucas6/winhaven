@@ -56,6 +56,23 @@ void Game::printBlockingArray() {
     }
 }
 
+void Game::printTownInfo() {
+    if (DEBUG_CONSOLE != nullptr) {
+        DEBUG_CONSOLE->cprintf("[game]\t=TOWN INFO=\n");
+        DEBUG_CONSOLE->cprintf("[game]\tBuildings:\n");
+        for (std::shared_ptr<Construct> b : world.gMap.TownList[0].BuildingList) {
+            DEBUG_CONSOLE->cprintf("\t\tType of Construct: %s\n", b->typeOfConstruct);
+            if (b->typeOfConstruct == ROOM_CON) {
+                std::shared_ptr<Room> roomptr = std::dynamic_pointer_cast<Room>(b);
+                DEBUG_CONSOLE->cprintf("\t\tType of Build: %s\n", roomptr->typeOfHouse);
+            }
+            DEBUG_CONSOLE->cprintf("\t\tOrigin Point: (%d,%d)\n", b->wallPoints[0].first, b->wallPoints[0].second);
+            DEBUG_CONSOLE->cprintf("- - - - - - - - - - - - - - - - - \n");
+        }
+        
+    }
+}
+
 void Game::EndGame() {
     
 }
