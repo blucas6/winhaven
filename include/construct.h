@@ -8,6 +8,9 @@
 #include "config.h"
 #include <memory>
 
+// PointStruct class
+//  Lowest possible object you can create in the world
+//  Has all necessary properties to be displayed, moved, carried, etc.
 class PointStruct {
     public:
         PointStruct();

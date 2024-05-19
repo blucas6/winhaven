@@ -114,9 +114,10 @@ Job_C_Farmer::Job_C_Farmer(CConsoleLoggerEx *_debugconsole) : Component(JOB_C, _
 }
 
 void Job_C_Farmer::Update(Being *self) {
-    // job thought and build must be done
+    // job thought - get from completing build
     if (self->thought == JOB_THOT) {
         // in order to farm the fields must be grown
+        // need to have seeds
         self->thought = NO_THOT;
     }
 }
@@ -375,8 +376,11 @@ bool Build_C::placeBlock(Being *self) {
     if (DEBUG_CONSOLE != nullptr) DEBUG_CONSOLE->cprintf("[build c]\tFINISHING ROOM\n");
     needtobuild = false;
     room.Finish(needGarden);
+    self->thought_list.push_back(JOB_THOT);
+    // DELETE THIS ////////
     for(std::pair<int,int> pos : room.floorPoints) {
         if ((*self->currPTArray)[pos.first][pos.second]->type == PT_TABLE) self->goToPT = pos;
     }
+    ///////////////////////
     return false; 
 }

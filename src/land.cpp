@@ -76,11 +76,11 @@ Rock::Rock() : LandTile("Rock", LAND_ID++, {FG_DARKGREY, FG_LIGHTGREY}, {':', '.
 
 Grass::Grass() : LandTile("Grass", LAND_ID++, {FG_GREEN}, {'\'', '"', '`', ',', ';'}) {}
 
-Moss::Moss() : LandTile("Moss", LAND_ID++, {FG_DARKCYAN}, {'*'}) {}
+Moss::Moss() : LandTile("Moss", LAND_ID++, {FG_DARKGREEN}, {'*'}) {}
 
 Tilled::Tilled() : LandTile("Tilled land", LAND_ID++, {FG_DARKYELLOW}, {'~'}) {}
 
-Barley::Barley() : LandTile("Barley", LAND_ID++, {FG_DARKYELLOW}, {';'}) {}
+Barley::Barley() : LandTile("Barley", LAND_ID++, {FG_DARKYELLOW}, {char(157)}) {}
 
 Hay::Hay() : LandTile("Hay", LAND_ID++, {FG_YELLOW}, {'"'}) {}
 

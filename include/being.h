@@ -35,10 +35,12 @@ class Being {
         std::vector<std::vector<std::shared_ptr<PointStruct>>> *currPTArray = nullptr;           // pointer to the mapslices pointstructs map - used for accessing specific structures by index
 
 
-        std::pair<int,int> goToPT;
+        std::pair<int,int> goToPT;  // delete me
         Town *myTown = nullptr;
 
         std::pair<int,int> laziness;        // how long they relax [MAX, COUNTER]
+
+        std::vector<std::shared_ptr<PointStruct>> Inventory;    // all items being held
 
         virtual void NewThought();
         virtual void Update();
@@ -47,6 +49,7 @@ class Being {
         void updateConstruct(std::pair<int,int> pt);
         void clearComponents();
         void goToGOTOPT();
+        int howManyInventory();
 };
 
 class Human : public Being {

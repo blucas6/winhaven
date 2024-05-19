@@ -18,7 +18,9 @@ class LandTile {
         std::vector<char> glyphs;
         void init();
 };
+
 // Actual land block
+//  Holds LandTiles as possible versions of the same land block
 class Land {
     public:
         Land(); // need default for map array
